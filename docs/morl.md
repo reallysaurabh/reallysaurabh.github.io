@@ -2,6 +2,7 @@
 layout: projects
 title: Home
 date: 2020-03-23
+logo: /assets/img/arch_iot.png
 ---
 
 # Multi-objective Reinforcement Learning based approach for User-Centric Power Optimization in Smart Home Environments
