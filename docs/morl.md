@@ -1,6 +1,7 @@
 ---
-layout: posts
+layout: projects
 title: Home
+date: 2020-03-23
 ---
 
 # Multi-objective Reinforcement Learning based approach for User-Centric Power Optimization in Smart Home Environments
