@@ -1,6 +1,6 @@
 ## This will be the landing page
 
-[Link to About me](https://github.com/reallysaurabh/reallysaurabh.github.io/blob/master/about.md)
+[Link to About me](reallysaurabh.github.io/about)
 
 
 ## Welcome to GitHub Pages
