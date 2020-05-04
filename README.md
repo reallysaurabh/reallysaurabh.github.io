@@ -3,7 +3,8 @@
 
 ### User-centric Power Management in Smart Home Environments
 
-![MORL](/assets/img/arch_iot.png =100x)  blablablablablablabla
+
+<img src="https://reallysaurabh.github.io/assets/img/arch_iot.png" width="100">  blablablablablablabla
 
 
 ## Talks, Honors and Achievements
