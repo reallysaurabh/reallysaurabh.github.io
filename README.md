@@ -45,7 +45,3 @@
 - Verismart.ai
 - Datalabs.in
 - Cybersecurity Consultant - myfastclaim.com
-
-## Hobbies and Interests
-
-- 
