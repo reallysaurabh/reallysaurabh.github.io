@@ -3,29 +3,29 @@
 
 ### Politics
 
-- Hashtag Analysis
-- Secret Ballot
+- [Hashtags are (not) judgemental: The untold story of Lok Sabha elections 2019](https://reallysaurabh.github.io/docs/politics/hashtag)
+- [\#IVoted to \#IGotPwned: Studying Voter Privacy Leaks in Indian Lok Sabha Elections on Twitter](https://reallysaurabh.github.io/docs/politics/vpl)
 
 ### Media Bias
 
-- Bias generation
-- Bias detection
-- Bias mitigation
+- [Viable Threat on News Reading: Analyzing and Generating Biased News Articles](https://reallysaurabh.github.io/docs/bias/generation)
+- [The Secret is in the Creation: Detecting Media Bias using cues from its generation ](https://reallysaurabh.github.io/docs/bias/detection)
+- [Stop Spreading Propaganda: Educational tools to mitigate media bias](https://reallysaurabh.github.io/docs/bias/mitigation)
 
 ### Privacy
 
-- IMDPGAN: Generating Private and Specific Data with Generative Adversarial Networks
-- Black box attack scenario for distracted driving detection
+- [IMDPGAN: Generating Private and Specific Data with Generative Adversarial Networks](https://reallysaurabh.github.io/docs/privacy/imdpgan) 
+- [Black box attack scenario for distracted driving detection](https://reallysaurabh.github.io/docs/privacy/driver)
 
 ### User-centric Power Management in Smart Home Environments
 
-- Making Smart Homes Smarter: Optimizing Energy Consumption with Human in the Loop.
-- Multi-objective Reinforcement Learning based approach for User-Centric Power Optimization in Smart Home Environments.
+- [Making Smart Homes Smarter: Optimizing Energy Consumption with Human in the Loop](https://reallysaurabh.github.io/docs/iot/mdp)
+- [Multi-objective Reinforcement Learning based approach for User-Centric Power Optimization in Smart Home Environments](https://reallysaurabh.github.io/docs/iot/morl)
 
 ### Misc
 
-- Hindi Text Summarization
-- Behavioral analysis for Malware Classification and Detection
+- [TL;DR: Summarizing News Articles in Hindi Language](https://reallysaurabh.github.io/docs/misc/hindi)
+- [Behavioral analysis for Malware Classification and Detection](https://reallysaurabh.github.io/docs/misc/malware)
   
 
 ## Talks, Honors and Achievements
@@ -34,14 +34,14 @@
 
 
 ## Experience
-- Visiting Researcher, National Institute of Informatics, Tokyo. 
-- Google Summer of Code with mlpack
+- Visiting Researcher, [Echizen Lab](http://research.nii.ac.jp/~iechizen/official/index-e.html), National Institute of Informatics, Tokyo. Jan 2020 - Present. 
+- [Google Summer of Code](https://summerofcode.withgoogle.com/) with [mlpack](https://www.mlpack.org/)
 
 ## Teaching
-- Head TA for the course Multimedia and Computing Applicaitons offered by Dr. Rajiv Ratn Shah. 
+- Head TA for the course Multimedia and Computing Applications offered by Dr. Rajiv Ratn Shah in Winter 2019. 
 
 
 ## Advisory
-- Verismart.ai
+- [verismart.ai](http://verismart.ai/)
 - Datalabs.in
 - Cybersecurity Consultant - myfastclaim.com
