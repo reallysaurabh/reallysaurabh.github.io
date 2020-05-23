@@ -38,8 +38,11 @@
   
 
 ## Talks, Honors and Achievements
+- Speaking at [ACM IGDTUW WORKSHOP](http://acmigdtuwchapter.tech/summerworkshop2020/index.html) - Register to secure your spot.
 - Talk on "Linux Security" in ACM Summer School on Cybersecurity and Data Analytics, IIIT-Delhi 2019.
 - Talk on "Attacking Databases" in ECE Homecoming 2019, IIITD.
+- Mentor at [OpenMined](https://www.openmined.org)
+- Awarded the [Secure and Private AI Scholarship](https://www.udacity.com/facebook-AI-scholarship) offered by Facebook on Udacity.
 
 
 ## Experience
@@ -48,6 +51,7 @@
 - Backend Engineer, Plotlabs Technologies Pvt. Ltd.
 - Data Science and Performace Engineer, Pitney Bowes Software India Pvt. Ltd.
 - Full Stack Developer at [Easy Future Development Group](https://www.efd-group.com), [Tata Power Delhi Distribution Limited](https://www.tatapower-ddl.com), [Tnine Infotech](https://tnine.io), and many others during my B.Tech. at [Cluster Innovation Centre, University of Delhi](https://ducic.ac.in)
+- Designed and Developed the [Sell Your Selfie](https://support.savethechildren.in/sell-your-selfie) Campaign for Save The Children, India.
 
 ## Teaching
 - Head TA for the course Multimedia and Computing Applications offered by Dr. Rajiv Ratn Shah in Winter 2019. 
