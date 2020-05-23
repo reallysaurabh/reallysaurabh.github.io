@@ -1,5 +1,5 @@
 
-## Research (This section is under development, links might not work as expected)
+## Research 
 
 ### Politics
 
