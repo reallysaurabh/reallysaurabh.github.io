@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bookstore>
+
+<html>
+	
+	<head>
+		<title>XML example</title>
+	</head>
+	<body>
+		
+		<bookstore>
 
 <book category="cooking">
   <title lang="en">Everyday Italian</title>
@@ -34,3 +41,8 @@
 </book>
 
 </bookstore>
+	</body>
+
+
+</html>
+
