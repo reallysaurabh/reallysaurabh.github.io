@@ -38,6 +38,7 @@
   
 
 ## Talks, Honors and Achievements
+- Wrote an Award Winning Blog on [Innovative Cyber Security and Data Protection Practices for the Digitally Driven World](https://blog.i4c.in/2020/06/i4c-blogathon-first-runner-up-prize.html).
 - Speaking at [ACM IGDTUW WORKSHOP](http://acmigdtuwchapter.tech/summerworkshop2020/index.html) - Register to secure your spot.
 - Talk on "Linux Security" in ACM Summer School on Cybersecurity and Data Analytics, IIIT-Delhi 2019.
 - Talk on "Attacking Databases" in ECE Homecoming 2019, IIITD.
