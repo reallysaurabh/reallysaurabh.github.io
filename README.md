@@ -4,23 +4,23 @@
 ### Politics
 
 - [Hashtags are (not) judgemental: The untold story of Lok Sabha elections 2019](https://arxiv.org/abs/1909.07151) - Accepted at [IEEE BigMM 2020](http://bigmm2020.org/)
-- \#IVoted to \#IGotPwned: Studying Voter Privacy Leaks in Indian Lok Sabha Elections on Twitter (In Progress)
+- \#IVoted to \#IGotPwned: Studying Voter Privacy Leaks in Indian Lok Sabha Elections on Twitter - Accepted at [SocInfo 2020](https://kdd.isti.cnr.it/socinfo2020/) as a Poster
 <!-- - (https://reallysaurabh.github.io/docs/politics/vpl) -->
 
 ### Media Bias (In Progress)
 
 - Viable Threat on News Reading: Analyzing and Generating Biased News Articles
 <!-- - (https://reallysaurabh.github.io/docs/bias/generation) -->
-- The Secret is in the Creation: Detecting Media Bias using cues from its generation
+<!-- - The Secret is in the Creation: Detecting Media Bias using cues from its generation -->
 <!-- - (https://reallysaurabh.github.io/docs/bias/detection) -->
-- Stop Spreading Propaganda: Educational tools to mitigate media bias
+<!-- - Stop Spreading Propaganda: Educational tools to mitigate media bias -->
 <!-- - (https://reallysaurabh.github.io/docs/bias/mitigation) -->
 
-### Privacy (In Progress)
+### Privacy 
 
-- IMDPGAN: Generating Private and Specific Data with Generative Adversarial Networks
+- IMDPGAN: Generating Private and Specific Data with Generative Adversarial Networks - Accepted at [IEEE TPS 2020](http://www.sis.pitt.edu/lersais/conference/tps/2020/)
 <!-- - (https://reallysaurabh.github.io/docs/privacy/imdpgan)  -->
-- Black box attack scenario for distracted driving detection
+- Black box attack scenario for distracted driving detection - Work under progress
 <!-- - (https://reallysaurabh.github.io/docs/privacy/driver) -->
 
 ### User-centric Power Management in Smart Home Environments
@@ -47,7 +47,7 @@
 
 
 ## Experience
-- Visiting Researcher, [Echizen Lab](http://research.nii.ac.jp/~iechizen/official/index-e.html), National Institute of Informatics, Tokyo. Jan 2020 - Present. 
+- Visiting Researcher, [Echizen Lab](http://research.nii.ac.jp/~iechizen/official/index-e.html), National Institute of Informatics, Tokyo. Jan 2020 - Aug 2020. [Click here to view certificate](https://www.linkedin.com/posts/reallysaurabh_nii-experience-cert-activity-6704675817026285568-1wNi) 
 - [Google Summer of Code](https://summerofcode.withgoogle.com/) with [mlpack](https://www.mlpack.org/)
 - Backend Engineer, Plotlabs Technologies Pvt. Ltd.
 - Data Science and Performace Engineer, Pitney Bowes Software India Pvt. Ltd.
