@@ -4,12 +4,12 @@
 ### Politics
 
 - [Hashtags are (not) judgemental: The untold story of Lok Sabha elections 2019](https://arxiv.org/abs/1909.07151) - Accepted at [IEEE BigMM 2020](http://bigmm2020.org/)
-- \#IVoted to \#IGotPwned: Studying Voter Privacy Leaks in Indian Lok Sabha Elections on Twitter - Accepted at [SocInfo 2020](https://kdd.isti.cnr.it/socinfo2020/) as a Poster
+- \#IVoted to \#IGotPwned: Studying Voter Privacy Leaks in Indian Lok Sabha Elections on Twitter - Accepted at [SocInfo 2020](https://kdd.isti.cnr.it/socinfo2020/)
 <!-- - (https://reallysaurabh.github.io/docs/politics/vpl) -->
 
-### Media Bias (In Progress)
+### Media Bias 
 
-- Viable Threat on News Reading: Analyzing and Generating Biased News Articles
+- [Viable Threat on News Reading: Analyzing and Generating Biased News Articles](https://arxiv.org/abs/2010.02150) - Accepted at [NLP+CSS Workshops](https://sites.google.com/site/nlpandcss/home) at EMNLP'2020
 <!-- - (https://reallysaurabh.github.io/docs/bias/generation) -->
 <!-- - The Secret is in the Creation: Detecting Media Bias using cues from its generation -->
 <!-- - (https://reallysaurabh.github.io/docs/bias/detection) -->
@@ -18,7 +18,7 @@
 
 ### Privacy 
 
-- IMDPGAN: Generating Private and Specific Data with Generative Adversarial Networks - Accepted at [IEEE TPS 2020](http://www.sis.pitt.edu/lersais/conference/tps/2020/)
+- [IMDPGAN: Generating Private and Specific Data with Generative Adversarial Networks](https://arxiv.org/abs/2009.13839) - Accepted at [IEEE TPS 2020](http://www.sis.pitt.edu/lersais/conference/tps/2020/)
 <!-- - (https://reallysaurabh.github.io/docs/privacy/imdpgan)  -->
 - Black box attack scenario for distracted driving detection - Work under progress
 <!-- - (https://reallysaurabh.github.io/docs/privacy/driver) -->
@@ -38,6 +38,7 @@
   
 
 ## Talks, Honors and Achievements
+- Speaking about Privacy and Consent as a guest speaker in Computing for Medicine course offered at IIIT-Delhi. [Slides](https://www.linkedin.com/posts/reallysaurabh_privacy-and-consent-activity-6717377088925634560-IWpq)
 - Wrote an Award Winning Blog on [Innovative Cyber Security and Data Protection Practices for the Digitally Driven World](https://blog.i4c.in/2020/06/i4c-blogathon-first-runner-up-prize.html).
 - Speaking at [ACM IGDTUW WORKSHOP](http://acmigdtuwchapter.tech/summerworkshop2020/index.html) - Register to secure your spot.
 - Talk on "Linux Security" in ACM Summer School on Cybersecurity and Data Analytics, IIIT-Delhi 2019.
@@ -47,7 +48,8 @@
 
 
 ## Experience
-- Visiting Researcher, [Echizen Lab](http://research.nii.ac.jp/~iechizen/official/index-e.html), National Institute of Informatics, Tokyo. Jan 2020 - Aug 2020. [Click here to view certificate](https://www.linkedin.com/posts/reallysaurabh_nii-experience-cert-activity-6704675817026285568-1wNi) 
+- Worked as a CyberSecurity consultant with [WISH](https://www.wishfoundationindia.org/) to create security and privacy policies.
+- Visiting Researcher, [Echizen Lab](http://research.nii.ac.jp/~iechizen/official/index-e.html), National Institute of Informatics, Tokyo. Jan 2020 - Present. [Click here to view certificate](https://www.linkedin.com/posts/reallysaurabh_nii-experience-cert-activity-6704675817026285568-1wNi) 
 - [Google Summer of Code](https://summerofcode.withgoogle.com/) with [mlpack](https://www.mlpack.org/)
 - Backend Engineer, Plotlabs Technologies Pvt. Ltd.
 - Data Science and Performace Engineer, Pitney Bowes Software India Pvt. Ltd.
