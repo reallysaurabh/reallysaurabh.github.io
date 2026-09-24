@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>On-Behalf-Of: Letting an Agent Act as the User, Not as the Platform — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="One almighty service account is not an identity model, it&#39;s a liability with an API">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-3);">
+          <p class="post-eyebrow">Agent Runtime Architecture · Post 14 of 21</p>
+          <h1>On-Behalf-Of: Letting an Agent Act as the User, Not as the Platform</h1>
+          <p class="post-subtitle">One almighty service account is not an identity model, it&#39;s a liability with an API</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>8 min read</span>
+            <span>1,075 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>Here&#39;s a question worth asking about any agent on your platform right now: when it reads a customer record, updates a ticket, or approves a request, whose permission is it actually using — the person who asked it to, or its own?</p>
+<p>If the honest answer is &quot;its own,&quot; you&#39;ve built something that&#39;s convenient right up until the moment it isn&#39;t: a single, powerful identity that every user&#39;s request funnels through, meaning the agent can now do anything any of its users could ever plausibly need — added together, forever, with no way to tell afterward which user&#39;s intent justified which action.</p>
+<h2 id="the-blanket-identity-anti-pattern">The Blanket-Identity Anti-Pattern</h2>
+<p>It&#39;s an easy trap to fall into because it&#39;s the <em>simplest possible thing that works</em>. You provision one service account for the agent, grant it enough permissions to do everything it might conceivably need to do on behalf of any user, and let every request flow through that one identity. The agent works. Demos go great. And you&#39;ve just built a system where:</p>
+<ul>
+<li><strong>Every user effectively has the agent&#39;s permissions</strong>, not their own. If the agent can read every customer&#39;s data because <em>some</em> user legitimately needs that for <em>some</em> customers, every user&#39;s request now has access to <em>every</em> customer, because the system has no concept of &quot;this specific request should only see what this specific person is allowed to see.&quot;</li>
+<li><strong>The audit log lies by omission.</strong> It can tell you &quot;the agent did X,&quot; but not &quot;user A asked for X, which they were allowed to do&quot; versus &quot;user B asked for the same X, which they weren&#39;t.&quot; From the log&#39;s perspective, those are identical events.</li>
+<li><strong>A compromised agent is a compromised everything.</strong> One overly-broad credential, one prompt injection that convinces the agent to take an action it shouldn&#39;t, and the blast radius is the full permission set of every user combined — not the permission set of whoever actually triggered the request.</li>
+</ul>
+<h2 id="token-exchange-fixes-the-whose-permission-is-this-problem">Token Exchange Fixes the Whose-Permission-Is-This Problem</h2>
+<p>The fix is a pattern usually called <strong>on-behalf-of (OBO)</strong> token exchange, and the idea is almost embarrassingly simple once you see it: instead of the agent using its own identity to act, it exchanges the calling user&#39;s token for a new, narrowly-scoped token that represents <em>that specific user</em>, and uses <em>that</em> to make the downstream call.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#374151"/>
+      </marker>
+      <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#10b981"/>
+      </marker>
+      <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#ef4444"/>
+      </marker>
+    </defs>
+
+    <!-- CORRECT FLOW -->
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#065f46">✓ On-Behalf-Of Flow</text>
+
+    <rect x="20" y="40" width="120" height="50" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="80" y="70" text-anchor="middle" font-size="12" fill="#065f46">User</text>
+
+    <rect x="220" y="40" width="150" height="50" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="295" y="62" text-anchor="middle" font-size="12" fill="#065f46">Agent</text>
+    <text x="295" y="78" text-anchor="middle" font-size="10" fill="#047857">holds user's token</text>
+
+    <rect x="450" y="40" width="170" height="50" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="535" y="62" text-anchor="middle" font-size="12" fill="#065f46">Token Exchange</text>
+    <text x="535" y="78" text-anchor="middle" font-size="10" fill="#047857">issues scoped token</text>
+
+    <rect x="700" y="40" width="190" height="50" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="795" y="62" text-anchor="middle" font-size="12" fill="#065f46">Downstream API</text>
+    <text x="795" y="78" text-anchor="middle" font-size="10" fill="#047857">acts AS the user</text>
+
+    <line x1="140" y1="65" x2="215" y2="65" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <line x1="370" y1="65" x2="445" y2="65" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <line x1="620" y1="65" x2="695" y2="65" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+    <!-- ANTI PATTERN -->
+    <text x="20" y="220" font-size="13" font-weight="700" fill="#991b1b">✗ Blanket-Identity Anti-Pattern</text>
+
+    <rect x="20" y="240" width="120" height="50" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+    <text x="80" y="270" text-anchor="middle" font-size="12" fill="#991b1b">User</text>
+
+    <rect x="220" y="240" width="150" height="50" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+    <text x="295" y="262" text-anchor="middle" font-size="12" fill="#991b1b">Agent</text>
+    <text x="295" y="278" text-anchor="middle" font-size="10" fill="#b91c1c">uses own admin cred</text>
+
+    <rect x="700" y="240" width="190" height="50" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+    <text x="795" y="262" text-anchor="middle" font-size="12" fill="#991b1b">Downstream API</text>
+    <text x="795" y="278" text-anchor="middle" font-size="10" fill="#b91c1c">acts as "the platform"</text>
+
+    <line x1="140" y1="265" x2="215" y2="265" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+    <line x1="370" y1="265" x2="695" y2="265" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrowRed)"/>
+    <line x1="480" y1="240" x2="620" y2="290" stroke="#ef4444" stroke-width="3"/>
+    <line x1="620" y1="240" x2="480" y2="290" stroke="#ef4444" stroke-width="3"/>
+
+    <text x="460" y="340" text-anchor="middle" font-size="12" fill="#6b7280">No per-user scoping — every request looks identical, and equally powerful.</text>
+  </svg></div><figcaption>it shows User → Agent (holding the user&#39;s token) → Token Exchange service → a downstream call made as the user, contrasted with a crossed-out anti-pattern box where the agent just uses its own admin credential for everything.</figcaption><a class="diagram-standalone-link" href="../diagrams/14-on-behalf-of-flow.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<p>The mechanics: the user&#39;s original token (or an assertion of their identity) gets passed to a token exchange service, which validates that the agent is allowed to request this exchange, and — critically — issues a new token scoped to what <em>that user</em> can do, not what the agent can do. Every downstream system now sees a request that says &quot;this specific user did this,&quot; which means:</p>
+<ul>
+<li><strong>Least privilege actually works</strong>, because the token the downstream system honors reflects the user&#39;s real permissions, not the agent&#39;s ceiling.</li>
+<li><strong>Audit trails are actually true.</strong> &quot;User A did X&quot; and &quot;user B did X&quot; are now genuinely different events with different provenance, because they are backed by different tokens.</li>
+<li><strong>A prompt injection or agent bug is contained</strong> to whatever the <em>calling user</em> could have done anyway — which, for most users on most systems, is a lot less catastrophic than what a blanket service account could have done.</li>
+</ul>
+<h2 id="a-small-concrete-example">A Small, Concrete Example</h2>
+<p>Picture an internal support agent at a healthcare SaaS company, built to help support reps look up patient billing questions. Junior reps can see billing status; senior reps can also issue refunds. If the agent runs under one shared service identity provisioned to &quot;do whatever any rep might need,&quot; a junior rep asking an innocuous question is, technically, one clever prompt away from getting the agent to issue a refund — because the <em>agent</em> has that permission, even though <em>that specific rep</em> never should.</p>
+<p>With OBO token exchange, the agent exchanges the junior rep&#39;s own token for a scoped one before making the refund-adjacent call. The downstream billing system checks that scoped token, sees &quot;junior rep, no refund permission,&quot; and declines — exactly as it would if the rep had tried to do it by hand. The agent didn&#39;t need to be smart enough to enforce that boundary. The identity system enforced it for free.</p>
+<h2 id="an-open-question-we-haven39t-fully-settled">An Open Question We Haven&#39;t Fully Settled</h2>
+<p>Where we&#39;re less confident: how far down the call chain OBO should propagate when an agent calls another agent, which calls a tool server, which calls yet another service. In principle the user&#39;s identity should thread all the way through. In practice, each hop adds latency and complexity, and we&#39;ve occasionally collapsed a hop back to a service identity for a narrow, well-audited case rather than build the full chain. We&#39;re not entirely comfortable with that compromise, and we&#39;d be interested to know if others have found a cleaner way to keep the chain unbroken without the overhead.</p>
+<h2 id="a-few-things-we39d-watch-for">A Few Things We&#39;d Watch For</h2>
+<p>Worth checking that &quot;OBO&quot; isn&#39;t quietly just a rename for the blanket identity — if the exchange service issues a token scoped to &quot;whatever the agent is generally allowed to do&quot; rather than the intersection of that and what the specific user can do, you&#39;ve added a hop without adding much actual safety.</p>
+<p>We&#39;d also resist skipping OBO for flows that feel &quot;trusted&quot; because they&#39;re internal-only. That instinct is understandable, but it&#39;s often how blanket identities get grandfathered in and never revisited — internal agents touching real user data seem to accumulate access over time precisely because fewer people are watching.</p>
+<p>And token lifetime matters more than it looks like it should: an OBO-exchanged token that lives for hours starts to function like a second static credential with extra steps. We&#39;ve had better luck keeping it short-lived and re-exchanging per request, or per session at most, in keeping with the rotation discipline from the previous post.</p>
+<p>Getting the &quot;whose permission is this&quot; question right made a real difference for us. The next post tackles a related but distinct question — what an agent is allowed to <em>remember</em> about someone afterward — and it&#39;s one where we changed our minds partway through building it.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #OAuth #LeastPrivilege #IdentityManagement #AIAgents</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#AIGovernance</span><span class="pill">#PlatformEngineering</span><span class="pill">#OAuth</span><span class="pill">#LeastPrivilege</span><span class="pill">#IdentityManagement</span><span class="pill">#AIAgents</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="13-machine-identity-for-agents.html"><span class="pager-direction">← Previous</span><span class="pager-title">Machine Identity for Autonomous Agents: No Human, No Shared Secret</span></a>
+    <a class="pager-link next" href="15-memory-is-a-resource.html"><span class="pager-direction">Next →</span><span class="pager-title">Memory Is a Resource, Not an Attribute</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#the-blanket-identity-anti-pattern">The Blanket-Identity Anti-Pattern</a></li>
+      <li><a href="#token-exchange-fixes-the-whose-permission-is-this-problem">Token Exchange Fixes the Whose-Permission-Is-This Problem</a></li>
+      <li><a href="#a-small-concrete-example">A Small, Concrete Example</a></li>
+      <li><a href="#an-open-question-we-haven39t-fully-settled">An Open Question We Haven&amp;#39;t Fully Settled</a></li>
+      <li><a href="#a-few-things-we39d-watch-for">A Few Things We&amp;#39;d Watch For</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

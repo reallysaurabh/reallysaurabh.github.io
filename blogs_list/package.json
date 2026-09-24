@@ -1,0 +1,14 @@
+{
+  "name": "enterprise-ai-platform-blog",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static site generator for the \"Building an Enterprise AI Platform That Scales\" blog series. Reads Markdown from linkedin/, writes a plain static site to site/ that deploys on Vercel with zero build step.",
+  "scripts": {
+    "build": "node build.js",
+    "serve": "npx --yes serve site"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.2"
+  }
+}

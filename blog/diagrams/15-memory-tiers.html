@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Agent Memory Tiers</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 18px; color: #1a1a2e; text-align: center; margin: 0 0 4px; }
+  p.caption { text-align: center; color: #6b7280; font-size: 13px; margin: 0 0 16px; }
+  svg { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Session Memory vs. Durable Memory</h1>
+  <p class="caption">Two independent resources, two lifecycles — not one boolean.</p>
+  <svg viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#6366f1"/>
+      </marker>
+    </defs>
+
+    <!-- Agent box -->
+    <rect x="340" y="20" width="180" height="55" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+    <text x="430" y="52" text-anchor="middle" font-size="14" font-weight="600" fill="#312e81">Agent</text>
+
+    <!-- Session memory -->
+    <rect x="80" y="150" width="280" height="120" rx="10" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+    <text x="220" y="180" text-anchor="middle" font-size="14" font-weight="600" fill="#92400e">Session Memory</text>
+    <text x="220" y="202" text-anchor="middle" font-size="11" fill="#b45309">ephemeral · scoped to one session</text>
+    <text x="220" y="220" text-anchor="middle" font-size="11" fill="#b45309">no opt-in needed</text>
+    <text x="220" y="238" text-anchor="middle" font-size="11" fill="#b45309">dies when the session ends</text>
+
+    <!-- Durable memory -->
+    <rect x="500" y="150" width="280" height="120" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="640" y="180" text-anchor="middle" font-size="14" font-weight="600" fill="#065f46">Durable Memory</text>
+    <text x="640" y="202" text-anchor="middle" font-size="11" fill="#047857">opt-in · cross-session</text>
+    <text x="640" y="220" text-anchor="middle" font-size="11" fill="#047857">own access controls</text>
+    <text x="640" y="238" text-anchor="middle" font-size="11" fill="#047857">own retention policy</text>
+
+    <!-- connectors -->
+    <path d="M400,75 C300,110 220,120 220,150" fill="none" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M460,75 C560,110 640,120 640,150" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <text x="430" y="310" text-anchor="middle" font-size="12" fill="#6b7280">Same agent, two independently governed resources.</text>
+  </svg>
+</div>
+</body>
+</html>

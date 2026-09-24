@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trace Collector Forked Off the Request Path</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fafafa; margin: 0; padding: 32px; color: #1a1a1a; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.caption { color: #666; font-size: 14px; margin: 0 0 24px; }
+  svg { width: 100%; height: auto; display: block; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Fork the Trace Stream, Don't Bolt It On</h1>
+  <p class="caption">The live request path never waits on the analytics store — the collector absorbs its slowness or downtime alone.</p>
+  <svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+      </marker>
+      <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+      </marker>
+    </defs>
+
+    <!-- Main path: Client -> Gateway -> Model -->
+    <rect x="40" y="60" width="110" height="55" rx="8" fill="#f5f5f5" stroke="#bbb"/>
+    <text x="95" y="92" text-anchor="middle" font-size="13" font-weight="600">Client</text>
+
+    <line x1="150" y1="87" x2="220" y2="87" stroke="#2c6e2f" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+    <rect x="220" y="60" width="150" height="55" rx="8" fill="#f0fff0" stroke="#7bc47f"/>
+    <text x="295" y="92" text-anchor="middle" font-size="13" font-weight="600" fill="#2c6e2f">LLM Gateway</text>
+
+    <line x1="370" y1="87" x2="440" y2="87" stroke="#2c6e2f" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+    <rect x="440" y="60" width="110" height="55" rx="8" fill="#f5f0ff" stroke="#a98fd6"/>
+    <text x="495" y="92" text-anchor="middle" font-size="13" font-weight="600" fill="#5b3a91">Model</text>
+
+    <line x1="440" y1="105" x2="380" y2="105" stroke="#2c6e2f" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow3)"/>
+    <text x="410" y="130" text-anchor="middle" font-size="10.5" fill="#2c6e2f" font-weight="600">main path: fast, unaffected by analytics</text>
+
+    <!-- Fork point -->
+    <line x1="295" y1="115" x2="295" y2="200" stroke="#888" stroke-width="1.6" stroke-dasharray="4,3"/>
+    <circle cx="295" cy="115" r="4" fill="#888"/>
+    <text x="310" y="150" font-size="10.5" fill="#888">fork (fire-and-forget,</text>
+    <text x="310" y="164" font-size="10.5" fill="#888">non-blocking)</text>
+
+    <line x1="295" y1="200" x2="295" y2="235" stroke="#888" stroke-width="1.6" marker-end="url(#arrow3)"/>
+
+    <!-- Collector -->
+    <rect x="190" y="240" width="210" height="60" rx="8" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="295" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#274b7a">Trace Collector</text>
+    <text x="295" y="284" text-anchor="middle" font-size="10.5" fill="#274b7a">buffers, retries, degrades alone</text>
+
+    <line x1="400" y1="270" x2="470" y2="270" stroke="#274b7a" stroke-width="2" marker-end="url(#arrow3)"/>
+
+    <!-- Analytics store -->
+    <rect x="470" y="240" width="220" height="60" rx="8" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="580" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#7a4a1a">Governed Analytics Store</text>
+    <text x="580" y="284" text-anchor="middle" font-size="10.5" fill="#c0392b">can be slow / down without harm</text>
+
+    <!-- warning bolt if store is down -->
+    <text x="740" y="270" font-size="22" fill="#c0392b">⚠</text>
+    <text x="765" y="266" font-size="10.5" fill="#c0392b">outage here</text>
+    <text x="765" y="280" font-size="10.5" fill="#c0392b">stays here</text>
+
+    <text x="40" y="340" font-size="11" fill="#888">Green = live request/response path · Blue/orange = forked telemetry path, decoupled from request latency</text>
+  </svg>
+</div>
+</body>
+</html>

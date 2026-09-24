@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Component-Prefixed Versioning</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fafafa; margin: 0; padding: 32px; color: #1a1a1a; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.caption { color: #666; font-size: 14px; margin: 0 0 24px; }
+  svg { width: 100%; height: auto; display: block; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Independent Version Lineages, One Monorepo</h1>
+  <p class="caption">Each component keeps its own tag timeline; the release pipeline turns a tag into an immutable, individually-versioned artifact.</p>
+  <svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+      </marker>
+    </defs>
+
+    <!-- monorepo box -->
+    <rect x="20" y="20" width="960" height="260" rx="10" fill="#f7f7f7" stroke="#ccc" stroke-dasharray="4,3"/>
+    <text x="40" y="42" font-size="13" font-weight="700" fill="#555">MONOREPO</text>
+
+    <!-- CLI lane -->
+    <text x="50" y="80" font-size="13" font-weight="700" fill="#274b7a">CLI</text>
+    <line x1="50" y1="95" x2="600" y2="95" stroke="#bbb" stroke-width="2"/>
+    <circle cx="120" cy="95" r="5" fill="#7fa8e0"/><text x="120" y="115" font-size="10.5" text-anchor="middle">cli-v2.1.0</text>
+    <circle cx="280" cy="95" r="5" fill="#7fa8e0"/><text x="280" y="115" font-size="10.5" text-anchor="middle">cli-v2.2.0</text>
+    <circle cx="470" cy="95" r="5" fill="#274b7a"/><text x="470" y="115" font-size="10.5" text-anchor="middle" font-weight="700">cli-v2.3.0</text>
+
+    <!-- Control plane lane -->
+    <text x="50" y="155" font-size="13" font-weight="700" fill="#7a4a1a">Control Plane</text>
+    <line x1="50" y1="170" x2="600" y2="170" stroke="#bbb" stroke-width="2"/>
+    <circle cx="160" cy="170" r="5" fill="#e0a95f"/><text x="160" y="190" font-size="10.5" text-anchor="middle">controlplane-v1.13.0</text>
+    <circle cx="360" cy="170" r="5" fill="#7a4a1a"/><text x="360" y="190" font-size="10.5" text-anchor="middle" font-weight="700">controlplane-v1.14.2</text>
+    <circle cx="500" cy="170" r="5" fill="#c0392b" stroke="#c0392b"/><text x="500" y="190" font-size="9.5" text-anchor="middle" fill="#c0392b">-dev.a1b2c3 (unpromotable)</text>
+
+    <!-- Proxy lane -->
+    <text x="50" y="230" font-size="13" font-weight="700" fill="#2c6e2f">Proxy</text>
+    <line x1="50" y1="245" x2="600" y2="245" stroke="#bbb" stroke-width="2"/>
+    <circle cx="200" cy="245" r="5" fill="#7bc47f"/><text x="200" y="265" font-size="10.5" text-anchor="middle">proxy-v0.8.2</text>
+    <circle cx="420" cy="245" r="5" fill="#2c6e2f"/><text x="420" y="265" font-size="10.5" text-anchor="middle" font-weight="700">proxy-v0.9.4</text>
+
+    <!-- arrows into pipeline -->
+    <line x1="470" y1="95" x2="700" y2="150" stroke="#274b7a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="360" y1="170" x2="700" y2="150" stroke="#7a4a1a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="420" y1="245" x2="700" y2="150" stroke="#2c6e2f" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+    <!-- pipeline box -->
+    <rect x="700" y="90" width="240" height="120" rx="8" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="820" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="#274b7a">Tag-Triggered</text>
+    <text x="820" y="138" text-anchor="middle" font-size="13" font-weight="700" fill="#274b7a">Release Pipeline</text>
+    <text x="820" y="162" text-anchor="middle" font-size="10.5" fill="#4a4a4a">builds only the tagged</text>
+    <text x="820" y="176" text-anchor="middle" font-size="10.5" fill="#4a4a4a">component, produces one</text>
+    <text x="820" y="190" text-anchor="middle" font-size="10.5" fill="#4a4a4a">immutable artifact</text>
+
+    <!-- output -->
+    <line x1="820" y1="210" x2="820" y2="250" stroke="#555" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <rect x="700" y="255" width="240" height="45" rx="8" fill="#f0fff0" stroke="#7bc47f"/>
+    <text x="820" y="282" text-anchor="middle" font-size="12" font-weight="600" fill="#2c6e2f">Deployed with a real, auditable version string</text>
+
+    <text x="40" y="315" font-size="11" fill="#888">Solid dots = tagged releases · red dot = ad-hoc dev build, structurally unpromotable</text>
+  </svg>
+</div>
+</body>
+</html>

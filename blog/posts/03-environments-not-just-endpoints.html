@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why Your AI Platform Needs Environments, Not Just Endpoints — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="&#39;/prod&#39; and &#39;/not-prod&#39; is not an environment strategy. It&#39;s a coin flip with a leading slash.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-1);">
+          <p class="post-eyebrow">Platform Foundations · Post 3 of 21</p>
+          <h1>Why Your AI Platform Needs Environments, Not Just Endpoints</h1>
+          <p class="post-subtitle">&#39;/prod&#39; and &#39;/not-prod&#39; is not an environment strategy. It&#39;s a coin flip with a leading slash.</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>9 min read</span>
+            <span>1,026 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>We learned this one the mildly stressful way, so let&#39;s save you the trouble: if your AI platform has exactly one environment, you don&#39;t have an environment strategy. You have a live production system that everyone is quietly terrified of touching, which is a different thing, and a worse one.</p>
+<p>Traditional software engineering settled the dev/staging/production question decades ago. Nobody ships a code change straight from a laptop to the customer-facing server anymore — well, almost nobody, and the ones who do have a story they tell at conferences with a nervous laugh. But AI platforms are young enough that a lot of teams are still treating &quot;the model registry&quot; or &quot;the agent config&quot; as one flat, global thing, promoted nowhere, tested against nothing but hope.</p>
+<h2 id="what-breaks-without-real-environments">What breaks without real environments</h2>
+<p>Picture a scaling logistics company running an internal AI platform. One team wants to try out a newly released model for a customer-support agent — genuinely reasonable, everyone wants to try the new thing. They register it. It&#39;s now sitting in the same model registry as every production model, addressable by every service that knows how to ask the registry for a model by name.</p>
+<p>A week later, someone building a completely unrelated production feature queries &quot;what models are available&quot; and gets the experimental one back in the list, because nothing distinguished it. Or worse: the experimental registration shares a name or a routing rule with something already serving production traffic, and now an in-progress experiment is quietly eating into a live customer path. Nobody did anything wrong, exactly. There just wasn&#39;t a wall where a wall needed to be.</p>
+<p>This is the core case for environments in an AI platform specifically: model registrations, agent configs, budget allocations — these are exactly the kind of thing you want to test, tune, and break in a space that provably cannot touch anything a customer is relying on right now.</p>
+<h2 id="the-topology-we-landed-on">The topology we landed on</h2>
+<p>We ended up with a fairly conventional shape — dev, staging, and production — with a few extra rules that turned out to matter more than the basic three-tier split itself. This isn&#39;t the only way to slice it, and if your org needs a fourth tier for something like a regulated-data environment, that&#39;s a very reasonable variation on the theme, not a deviation from it.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 960 380" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444" />
+      </marker>
+    </defs>
+
+    <!-- DEV -->
+    <rect x="30" y="60" width="250" height="220" rx="10" fill="#f4f8f4" stroke="#3c8a3c" stroke-width="2"/>
+    <text x="155" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#2e6b2e">DEV</text>
+    <rect x="55" y="105" width="200" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="155" y="129" text-anchor="middle" font-size="12">Model registrations (dev)</text>
+    <rect x="55" y="155" width="200" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="155" y="179" text-anchor="middle" font-size="12">Agent configs (dev)</text>
+    <rect x="55" y="205" width="200" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="155" y="229" text-anchor="middle" font-size="12">Budget allocation (dev)</text>
+
+    <!-- STAGING -->
+    <rect x="355" y="60" width="250" height="220" rx="10" fill="#f6f5ee" stroke="#a8860b" stroke-width="2"/>
+    <text x="480" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#8a6d09">STAGING</text>
+    <rect x="380" y="105" width="200" height="40" rx="6" fill="#f2ecd0" stroke="#a8860b"/>
+    <text x="480" y="129" text-anchor="middle" font-size="12">Model registrations (staging)</text>
+    <rect x="380" y="155" width="200" height="40" rx="6" fill="#f2ecd0" stroke="#a8860b"/>
+    <text x="480" y="179" text-anchor="middle" font-size="12">Agent configs (staging)</text>
+    <rect x="380" y="205" width="200" height="40" rx="6" fill="#f2ecd0" stroke="#a8860b"/>
+    <text x="480" y="229" text-anchor="middle" font-size="12">Budget allocation (staging)</text>
+
+    <!-- PROD -->
+    <rect x="680" y="60" width="250" height="220" rx="10" fill="#faeeee" stroke="#b03a3a" stroke-width="2"/>
+    <text x="805" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="#8f2c2c">PRODUCTION</text>
+    <rect x="705" y="105" width="200" height="40" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="805" y="129" text-anchor="middle" font-size="12">Model registrations (prod)</text>
+    <rect x="705" y="155" width="200" height="40" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="805" y="179" text-anchor="middle" font-size="12">Agent configs (prod)</text>
+    <rect x="705" y="205" width="200" height="40" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="805" y="229" text-anchor="middle" font-size="12">Budget allocation (prod)</text>
+
+    <!-- promotion arrows -->
+    <line x1="280" y1="170" x2="350" y2="170" stroke="#444" stroke-width="2.5" marker-end="url(#arrow2)"/>
+    <text x="315" y="160" text-anchor="middle" font-size="11" fill="#444">promote</text>
+    <line x1="605" y1="170" x2="675" y2="170" stroke="#444" stroke-width="2.5" marker-end="url(#arrow2)"/>
+    <text x="640" y="160" text-anchor="middle" font-size="11" fill="#444">promote</text>
+
+    <!-- governance callout -->
+    <rect x="680" y="300" width="250" height="60" rx="8" fill="#1a1a1a"/>
+    <text x="805" y="323" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Governance rule:</text>
+    <text x="805" y="342" text-anchor="middle" fill="#fff" font-size="11.5">exactly ONE customer-facing</text>
+    <text x="805" y="356" text-anchor="middle" fill="#fff" font-size="11.5">control plane may exist here</text>
+  </svg></div><figcaption>It shows the three environments, per-environment model registrations sitting inside each one rather than shared globally, and the promotion path connecting them — plus a callout on the one governance rule we found we actually needed to enforce, not just suggest.</figcaption><a class="diagram-standalone-link" href="../diagrams/03-environment-topology.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<p><strong>Model registrations are per-environment, not global.</strong> A model registered in dev is invisible to staging and production. It has to be explicitly, deliberately registered again in the next environment up — which sounds like friction, and is, on purpose. The alternative — one global registry with an environment tag on each entry — sounds more elegant right up until someone forgets to check the tag, or a query forgets to filter on it, and now you&#39;re back to the logistics-company scenario above.</p>
+<p><strong>Promotion is a deliberate action, not automatic.</strong> Nothing in staging silently becomes production just because it&#39;s been sitting there quietly and nobody complained. Someone — or some pipeline, with someone&#39;s sign-off baked in — has to say &quot;yes, promote this.&quot;</p>
+<h2 id="the-one-governance-rule-that-mattered-more-than-the-rest">The one governance rule that mattered more than the rest</h2>
+<p>Here&#39;s the rule that, in hindsight, did more work than anything else in the topology: <strong>exactly one customer-facing control plane may exist in production at a time.</strong></p>
+<p>It sounds almost too obvious to write down. It wasn&#39;t, in practice, because &quot;control plane&quot; is exactly the kind of thing a well-meaning team might want to stand up a second instance of — for a migration, for a regional split, for &quot;just testing something in a prod-like way.&quot; Every one of those instincts is reasonable in isolation. The problem is that a second production control plane isn&#39;t a parallel universe, it&#39;s a second source of truth for things like budget enforcement and access control, and two sources of truth for the same real-world resource is a recipe for exactly the kind of split-brain problem you&#39;d expect: two systems disagreeing about who&#39;s allowed to spend what, each confident it&#39;s right.</p>
+<p>We don&#39;t think this rule is unique to AI platforms — it&#39;s really just &quot;don&#39;t run two masters&quot; wearing an AI-shaped hat — but it&#39;s easy to violate specifically <em>because</em> AI infrastructure gets built in a hurry, under pressure to ship something impressive, and &quot;spin up a second instance real quick&quot; feels lower-risk for infrastructure that&#39;s new enough that nobody&#39;s built the instincts around it yet.</p>
+<h2 id="what-goes-wrong-without-this">What goes wrong without this</h2>
+<p>Skip the environment split, or skip the one-control-plane rule, and the failure modes we&#39;ve seen (or narrowly avoided) tend to be some version of:</p>
+<ul>
+<li>An experimental model change in &quot;not-quite-production&quot; affects a customer-facing path, because nothing structurally prevented it from being reachable.</li>
+<li>Two systems each believe they&#39;re the authority on a resource&#39;s state, and reconciling them after the fact is a genuinely unpleasant afternoon.</li>
+<li>Nobody can confidently answer &quot;is this specific model registration live in production right now,&quot; because the registry doesn&#39;t have a concept of &quot;which environment am I actually in.&quot;</li>
+</ul>
+<p>None of these are exotic failures. They&#39;re the AI-platform version of the exact bugs that dev/staging/prod solved for regular software fifteen years ago — it&#39;s just that we all had to relearn the lesson because the shiny new thing didn&#39;t feel like it needed the boring old discipline. It did.</p>
+<p>We&#39;re fairly confident in the three-environment shape itself, less confident that our promotion process is the <em>best</em> version of it rather than just a working one — if you&#39;ve built something more automated or more clever here, that&#39;s a comparison we&#39;d actually want to have.</p>
+<p>Next: <a href="04-dont-leak-vendor-model-names.html">post 4</a>, on a mistake that&#39;s easy to make even <em>inside</em> a well-structured environment — letting a vendor&#39;s own model name leak into your API as if it were something you controlled.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIPlatform #PlatformEngineering #DevOps #SoftwareArchitecture #Environments #AIGovernance #MLOps #CloudArchitecture #TechLeadership</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIPlatform</span><span class="pill">#PlatformEngineering</span><span class="pill">#DevOps</span><span class="pill">#SoftwareArchitecture</span><span class="pill">#Environments</span><span class="pill">#AIGovernance</span><span class="pill">#MLOps</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="02-identity-ecosystem-fork-google-vs-azure.html"><span class="pager-direction">← Previous</span><span class="pager-title">Google Workspace vs. Microsoft 365/Azure: How Your Identity Ecosystem Forks Your AI Platform</span></a>
+    <a class="pager-link next" href="04-dont-leak-vendor-model-names.html"><span class="pager-direction">Next →</span><span class="pager-title">Don&#39;t Let Vendor Model Names Leak Into Your API</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#what-breaks-without-real-environments">What breaks without real environments</a></li>
+      <li><a href="#the-topology-we-landed-on">The topology we landed on</a></li>
+      <li><a href="#the-one-governance-rule-that-mattered-more-than-the-rest">The one governance rule that mattered more than the rest</a></li>
+      <li><a href="#what-goes-wrong-without-this">What goes wrong without this</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

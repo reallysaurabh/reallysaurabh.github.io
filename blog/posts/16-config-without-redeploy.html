@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Config That Changes Without a Redeploy: Env Vars and Protocol as Runtime Concerns — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="If changing a timeout requires a release train, you didn&#39;t build infrastructure, you built a very slow form">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-3);">
+          <p class="post-eyebrow">Agent Runtime Architecture · Post 16 of 21</p>
+          <h1>Config That Changes Without a Redeploy: Env Vars and Protocol as Runtime Concerns</h1>
+          <p class="post-subtitle">If changing a timeout requires a release train, you didn&#39;t build infrastructure, you built a very slow form</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>7 min read</span>
+            <span>943 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>Immutable infrastructure is one of those ideas that&#39;s correct often enough to become dogma, and dogma is where good engineering practices go to stop being examined. &quot;Never change a running deployment, always redeploy&quot; is right for the things that determine correctness — code, dependencies, the artifact itself. It is <em>not</em> automatically right for every value that happens to live in a config file next to that artifact.</p>
+<h2 id="the-tell-when-quotjust-a-config-changequot-becomes-a-release">The Tell: When &quot;Just a Config Change&quot; Becomes a Release</h2>
+<p>You know you&#39;ve over-applied immutability when a one-line, low-risk config tweak — bump a timeout, add an allowed origin, switch which protocol an agent speaks to a particular tool server — requires the exact same ceremony as shipping new code: a build, a review, a staged rollout, a rollback plan for something that was never actually a code change in the first place.</p>
+<p>Two things go wrong when this happens. First, it&#39;s slow — genuinely operationally slow, in a way that compounds when you&#39;re running dozens or hundreds of agents each with their own small config differences. Second, and worse, it creates the exact incentive you built immutability to prevent: when the &quot;proper&quot; path to change a value is annoyingly heavyweight, people start finding the improper path. Someone SSHes in, or exec&#39;s into a container, or hand-edits a value directly against production &quot;just this once, I&#39;ll fix it properly tomorrow.&quot; Immutability&#39;s whole promise — that what&#39;s running matches what&#39;s declared — quietly stops being true, and nobody notices until it matters.</p>
+<h2 id="not-all-config-is-created-equal">Not All Config Is Created Equal</h2>
+<p>The fix isn&#39;t &quot;abandon immutability.&quot; It&#39;s recognizing that config splits into two categories with genuinely different risk profiles:</p>
+<p><strong>Build-time config</strong> affects correctness. Which dependencies are compiled in, which model version an agent is pinned to, which code path executes. Changing this <em>should</em> require a full redeploy, because the whole point of a deploy pipeline — review, testing, staged rollout — exists to catch the ways this kind of change can break things.</p>
+<p><strong>Runtime config</strong> doesn&#39;t touch the deployed artifact&#39;s correctness at all. Environment variables that tune behavior (a timeout, a feature flag, an allowed-origins list), or which wire protocol an agent uses to talk to a given tool server. These are things that are <em>expected</em> to change often, don&#39;t require re-validating the artifact itself, and gain nothing from being bundled into a release.</p>
+<p>The design move is to make the second category genuinely mutable in place — a config store an agent reads from at startup and can be told to re-read, or a control-plane API that pushes updated values to a running instance — while keeping the first category exactly as immutable as it already is.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#ef4444"/>
+      </marker>
+      <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#10b981"/>
+      </marker>
+    </defs>
+
+    <!-- Left: baked in -->
+    <rect x="40" y="40" width="340" height="60" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+    <text x="210" y="65" text-anchor="middle" font-size="13" font-weight="600" fill="#991b1b">Change a value</text>
+    <text x="210" y="83" text-anchor="middle" font-size="11" fill="#b91c1c">(baked into image)</text>
+
+    <line x1="210" y1="100" x2="210" y2="130" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+    <rect x="40" y="140" width="340" height="60" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+    <text x="210" y="175" text-anchor="middle" font-size="13" fill="#991b1b">Build → review → redeploy every instance</text>
+
+    <text x="210" y="230" text-anchor="middle" font-size="12" fill="#6b7280">Full release cycle for a one-line change</text>
+
+    <!-- Right: runtime -->
+    <rect x="480" y="40" width="340" height="60" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="650" y="65" text-anchor="middle" font-size="13" font-weight="600" fill="#065f46">Change a value</text>
+    <text x="650" y="83" text-anchor="middle" font-size="11" fill="#047857">(runtime config)</text>
+
+    <line x1="650" y1="100" x2="650" y2="130" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+    <rect x="480" y="140" width="340" height="60" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="650" y="175" text-anchor="middle" font-size="13" fill="#065f46">Update value → agent picks it up, logged &amp; attributable</text>
+
+    <text x="650" y="230" text-anchor="middle" font-size="12" fill="#6b7280">No new artifact, no coordination — still audited</text>
+  </svg></div><figcaption>a side-by-side comparison of &quot;baked into image&quot; (requires full redeploy) versus &quot;injected at runtime&quot; (mutable in place, no redeploy).</figcaption><a class="diagram-standalone-link" href="../diagrams/16-config-baked-vs-runtime.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<h2 id="a-small-concrete-example">A Small, Concrete Example</h2>
+<p>Say an agent talks to a tool server over one transport protocol, and the platform team wants to migrate it to a newer one — a change that affects zero business logic, just how bytes move between two components that already trust each other. If protocol selection is baked into the deployment image, this &quot;just a plumbing change&quot; requires a full build-review-rollout cycle for every single agent using that tool server, on every team&#39;s schedule, coordinated across however many teams that turns out to be.</p>
+<p>If protocol selection is a runtime config value instead, the migration becomes: update the value, the agent picks it up on its next config refresh (or immediately, if your control plane pushes it), done. No new image. No release coordination. No teams need to even notice unless something breaks — and if it does, rolling back is changing the value back, not re-deploying the previous artifact.</p>
+<h2 id="honestly-the-line-isn39t-always-obvious">Honestly, the Line Isn&#39;t Always Obvious</h2>
+<p>We&#39;ll admit the build-time/runtime distinction sounds cleaner than it always is to draw. We&#39;ve had genuine disagreements internally about whether a given value — a retry count, say — is &quot;just tuning&quot; or &quot;close enough to correctness-affecting&quot; to warrant a real release. We don&#39;t have a crisp test for it beyond &quot;when in doubt, treat it as build-time and revisit if the friction becomes a real problem.&quot; That&#39;s more of a heuristic than a principle, and we&#39;re open to a better one.</p>
+<h2 id="a-few-things-we39d-watch-for">A Few Things We&#39;d Watch For</h2>
+<p>We&#39;d be cautious about letting &quot;runtime config&quot; become an escape hatch for changes that actually affect correctness. If a wrong value could cause a subtly incorrect result rather than just a different-but-valid behavior, we&#39;ve found it&#39;s usually worth the extra friction of treating it as build-time.</p>
+<p>We&#39;d also want a runtime config path to carry a real audit trail. Part of why people reach for hand-editing prod is that it&#39;s fast — if the legitimate mechanism is just as fast but logged, versioned, and attributable, that removes most of the incentive for the workaround. Fast but unaudited just legitimizes the same risk under a nicer name.</p>
+<p>And it&#39;s worth not skipping validation just because a change is &quot;only&quot; runtime config — a malformed protocol value or a nonsensical timeout pushed at runtime can break an agent as thoroughly as bad code, often faster, since it skips whatever gates a real deploy would have gone through.</p>
+<p>Getting the build-time/runtime split roughly right has kept our platform faster without feeling reckless, though we&#39;re still refining where exactly the line sits. The next post asks a related question — not about <em>what</em> config an agent needs, but about <em>tool servers</em> it depends on, and why those seemed to want a resource type of their own.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #DevOps #ConfigManagement #CloudNative</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#AIGovernance</span><span class="pill">#PlatformEngineering</span><span class="pill">#DevOps</span><span class="pill">#ConfigManagement</span><span class="pill">#CloudNative</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="15-memory-is-a-resource.html"><span class="pager-direction">← Previous</span><span class="pager-title">Memory Is a Resource, Not an Attribute</span></a>
+    <a class="pager-link next" href="17-tool-servers-deserve-own-resource-type.html"><span class="pager-direction">Next →</span><span class="pager-title">Tool Servers Deserve Their Own Resource Type</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#the-tell-when-quotjust-a-config-changequot-becomes-a-release">The Tell: When &amp;quot;Just a Config Change&amp;quot; Becomes a Release</a></li>
+      <li><a href="#not-all-config-is-created-equal">Not All Config Is Created Equal</a></li>
+      <li><a href="#a-small-concrete-example">A Small, Concrete Example</a></li>
+      <li><a href="#honestly-the-line-isn39t-always-obvious">Honestly, the Line Isn&amp;#39;t Always Obvious</a></li>
+      <li><a href="#a-few-things-we39d-watch-for">A Few Things We&amp;#39;d Watch For</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

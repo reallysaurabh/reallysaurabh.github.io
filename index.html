@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<!--
+  SOURCE for the site homepage (reallysaurabh.github.io/index.html).
+  Edit this file, then run `node build.js` from blogs_list/ — the build replaces
+  the BLOG_SECTION marker below with the current post list and writes ../index.html.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saurabh Gupta — AI Platform Engineer &amp; Researcher</title>
+<meta name="description" content="Saurabh Gupta — AI leader, technical architect and published researcher building enterprise AI platforms, LLM gateways and agentic systems.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Saurabh Gupta — AI Platform Engineer &amp; Researcher">
+<meta property="og:description" content="Building enterprise AI platforms, LLM gateways and agentic systems. Notes, research and experience.">
+<meta property="og:url" content="https://reallysaurabh.github.io/">
+<meta property="og:image" content="https://reallysaurabh.github.io/assets/img/profile.jpg">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="assets/img/profile.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="blog/assets/css/style.css">
+<link rel="stylesheet" href="assets/css/home.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body class="page-home">
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="#top">
+      <span>Saurabh Gupta</span>
+    </a>
+    <div class="header-actions">
+      <nav class="home-nav" aria-label="Sections">
+        <a href="#experience">Experience</a>
+        <a href="#writing">Writing</a>
+        <a href="#research">Research</a>
+        <a href="#skills">Skills</a>
+        <a href="#life">Life</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">&#x1F319;</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============================================================ Intro -->
+<section class="home-hero">
+  <div class="container home-hero-grid">
+    <div class="home-hero-text">
+      <p class="hero-kicker">AI Platform Engineer · Maersk</p>
+      <h1>Saurabh Gupta</h1>
+      <p class="home-lede">AI leader, technical architect and published researcher. I bridge cutting-edge AI research and enterprise-scale production — enterprise AI platforms, LLM gateways, autonomous agents and scalable ML systems, from startups to Fortune 500.</p>
+      <div class="home-cta">
+        <a class="btn btn-primary" href="#writing">Read my writing</a>
+        <a class="btn" href="resume/saurabh_19052026.pdf" target="_blank" rel="noopener">Résumé (PDF)</a>
+        <a class="btn" href="mailto:saurabhgupta3012@gmail.com">Get in touch</a>
+      </div>
+      <p class="home-social">
+        <a href="https://www.linkedin.com/in/saurabhgupta3012/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/reallysaurabh" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://twitter.com/federated_monk" target="_blank" rel="noopener">Twitter / X</a>
+        <a href="mailto:saurabhgupta3012@gmail.com">Email</a>
+      </p>
+    </div>
+    <div class="home-portrait">
+      <img src="assets/img/profile.jpg" alt="Portrait of Saurabh Gupta" width="320" height="320">
+    </div>
+  </div>
+  <div class="container">
+    <dl class="home-stats">
+      <div><dt>10+ yrs</dt><dd>building AI systems</dd></div>
+      <div><dt>10k+</dt><dd>teams on the platform I build</dd></div>
+      <div><dt>$7.5M</dt><dd>revenue from GenAI products</dd></div>
+      <div><dt>75×</dt><dd>search query coverage</dd></div>
+      <div><dt>9</dt><dd>peer-reviewed papers</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ============================================================ Experience -->
+<section class="home-section" id="experience">
+  <div class="container">
+    <div class="section-heading">
+      <h2>Experience</h2>
+      <p>Where I've built, shipped and led.</p>
+    </div>
+
+    <ol class="timeline">
+      <li class="timeline-item is-current">
+        <div class="timeline-head">
+          <div>
+            <h3>Maersk Global</h3>
+            <p class="timeline-role">AI Platform Engineer</p>
+          </div>
+          <p class="timeline-when">Jan 2026 – Present<span>Remote, India</span></p>
+        </div>
+        <ul>
+          <li>Building <strong>MIDAS</strong> (Maersk Integrated Data and AI Solutions), the enterprise GenAI platform that lets 10,000+ teams and 100,000+ people build securely on LLMs — agent gateway, model catalogues, runtime, identity, evaluations and observability.</li>
+          <li>Developed the control plane for authentication and authorization, an AI gateway to monitor and govern LLM usage across teams, on-prem GPU setup, and SMUS blueprints that handle the heavy lifting of the modeling process.</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">GenAI</span><span class="pill">Platform Engineering</span><span class="pill">LLM Gateways</span><span class="pill">Governance</span><span class="pill">Observability</span></p>
+      </li>
+
+      <li class="timeline-item">
+        <div class="timeline-head">
+          <div>
+            <h3>Cloudsufi · Google Extended Workforce</h3>
+            <p class="timeline-role">AI Solution Architect &amp; Technical Product Manager (Consultant)</p>
+          </div>
+          <p class="timeline-when">Jan 2025 – Dec 2025<span>Remote, US</span></p>
+        </div>
+        <ul>
+          <li>Engineered <a href="https://indiadatacommons.org" target="_blank" rel="noopener">indiadatacommons.org</a> by integrating Google Data Commons with Gemini and MCP, giving Google, MoSPI and IIIT-Bangalore automated policy-analysis tools that generated <strong>$7.5M</strong> in revenue.</li>
+          <li>Led a team of AI engineers building internal automations and custom GenAI solutions for the Google Data Commons team.</li>
+          <li>Codified the Seba Technology Disruption Framework into a GenAI digital twin of Tony Seba, and architected an investment decision-support engine for a $5.6B AUM hedge fund (Autonomy Capital).</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">Gemini</span><span class="pill">MCP</span><span class="pill">Google ADK</span><span class="pill">RAG</span><span class="pill">GCP</span></p>
+      </li>
+
+      <li class="timeline-item">
+        <div class="timeline-head">
+          <div>
+            <h3>Indeep AI</h3>
+            <p class="timeline-role">AI Solution Architect &amp; Technical Product Manager (Consultant)</p>
+          </div>
+          <p class="timeline-when">Jul 2024 – Jun 2025<span>Remote, Spain</span></p>
+        </div>
+        <ul>
+          <li>Architected and launched <a href="https://typewiser.com" target="_blank" rel="noopener">Typewiser</a>, the foundational technology for Dialogic, helping secure a <strong>€2.5M</strong> European Innovation Council grant.</li>
+          <li>Led a team of 3 orchestrating AI microservices (FastAPI) and MLOps workflows, tuning LLM latency and cost to scale from research prototype to a grant-funded company.</li>
+          <li>Engineered the LLM-driven assessment framework for the ASTOUND project and co-authored the resulting <em>Nature Human Behaviour</em> paper on Theory of Mind in LLMs and humans.</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">FastAPI</span><span class="pill">LLMs</span><span class="pill">Agents</span><span class="pill">MLOps</span><span class="pill">Benchmarking</span></p>
+      </li>
+
+      <li class="timeline-item">
+        <div class="timeline-head">
+          <div>
+            <h3>Pitney Bowes</h3>
+            <p class="timeline-role">Advisory Data Scientist</p>
+          </div>
+          <p class="timeline-when">May 2022 – Jul 2024<span>Noida, India</span></p>
+        </div>
+        <ul>
+          <li>Engineered an LLM agent-based business rules engine that translates natural language into executable logic, automating rule authoring for compliance operations.</li>
+          <li>Architected high-precision ML models on GCP for HS code classification and restricted-item prediction, saving <strong>$600K+</strong> a year in compliance costs.</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">LLM Agents</span><span class="pill">NLP</span><span class="pill">GCP</span><span class="pill">MLOps</span></p>
+      </li>
+
+      <li class="timeline-item">
+        <div class="timeline-head">
+          <div>
+            <h3>Amazon</h3>
+            <p class="timeline-role">Applied Scientist Intern</p>
+          </div>
+          <p class="timeline-when">Jan 2021 – Jul 2021<span>Bangalore, India</span></p>
+        </div>
+        <ul>
+          <li>Built multilingual transformer models and transcription pipelines to improve search relevance for Hindi, Tamil and French language-of-preference queries.</li>
+          <li>Achieved a <strong>60–75×</strong> increase in query coverage at 95% precision over the legacy baseline.</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">AWS</span><span class="pill">Transformers</span><span class="pill">Multilingual NLP</span></p>
+      </li>
+
+      <li class="timeline-item">
+        <div class="timeline-head">
+          <div>
+            <h3>Precog @ IIIT-Delhi</h3>
+            <p class="timeline-role">Research Scholar (AI &amp; Privacy)</p>
+          </div>
+          <p class="timeline-when">Jun 2018 – May 2022<span>Delhi, India</span></p>
+        </div>
+        <ul>
+          <li>Directed a team of 20 building AASMA, a social media analysis engine adopted by <strong>60+</strong> Indian government organizations.</li>
+          <li>Developed <code>pyadel</code> for Infosys, a Python package for synthetic multi-table data generation with relationship constraints; shaped cybersecurity and data-sharing policy with the WISH Foundation.</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">Privacy-preserving ML</span><span class="pill">Synthetic Data</span><span class="pill">Social Computing</span></p>
+      </li>
+
+      <li class="timeline-item">
+        <div class="timeline-head">
+          <div>
+            <h3>Google Summer of Code · mlpack</h3>
+            <p class="timeline-role">Open Source Contributor</p>
+          </div>
+          <p class="timeline-when">May 2017 – Jul 2017<span>Remote</span></p>
+        </div>
+        <ul>
+          <li>Migrated 345,000 test configurations from VMs to Docker, cutting storage by <strong>70%</strong>, and built Jenkins CI/CD pipelines on a custom minimal Linux image.</li>
+        </ul>
+        <p class="timeline-tags"><span class="pill">Docker</span><span class="pill">Jenkins</span><span class="pill">CI/CD</span><span class="pill">Linux</span></p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ Writing (generated) -->
+<section class="home-section" id="writing">
+  <div class="container">
+    <div class="section-heading">
+      <h2>Writing</h2>
+      <p>Long-form notes on building AI platforms.</p>
+    </div>
+    <div class="series-banner">
+      <div class="series-banner-top">
+        <p class="hero-kicker">A 21-part field series</p>
+        <h3><a href="blog/index.html">Building an Enterprise AI Platform That Scales</a></h3>
+        <p>Notes on the architectural decisions behind an internal AI platform for a modern, cloud-native org — written up as generalized patterns, not a case study of one company. Some of this held up under real scale. Some of it we&#39;d do differently. We&#39;re sharing both.</p>
+        <div class="hero-meta">
+          <span><strong>21</strong> posts</span>
+          <span><strong>108</strong> min total read</span>
+          <span><strong>19</strong> diagrams</span>
+        </div>
+        <div class="home-cta">
+          <a class="btn btn-primary" href="blog/posts/01-why-you-need-an-ai-platform.html">Start with post 1</a>
+          <a class="btn" href="blog/index.html">Browse the series</a>
+        </div>
+      </div>
+      <div class="series-parts">
+      <div class="series-part">
+        <h4><span class="part-dot" style="background: hsl(var(--part-0));"></span>The Case, and the Fork</h4>
+        <ol>
+          <li><a href="blog/posts/01-why-you-need-an-ai-platform.html" title="The shadow IT of the 2010s is back, wearing a nicer jacket and calling itself &#39;innovation.&#39;">
+            <span class="post-num">01</span>
+            <span class="post-title">Why You Need an AI Platform, Not Just AI Tools</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/02-identity-ecosystem-fork-google-vs-azure.html" title="You don&#39;t pick your cloud identity provider. It picks you, sometime around when someone signed a contract you weren&#39;t in the room for.">
+            <span class="post-num">02</span>
+            <span class="post-title">Google Workspace vs. Microsoft 365/Azure: How Your Identity Ecosystem Forks Your AI Platform</span>
+            <span class="post-time">10 min read</span>
+          </a></li>
+        </ol>
+      </div>
+      <div class="series-part">
+        <h4><span class="part-dot" style="background: hsl(var(--part-1));"></span>Platform Foundations</h4>
+        <ol>
+          <li><a href="blog/posts/03-environments-not-just-endpoints.html" title="&#39;/prod&#39; and &#39;/not-prod&#39; is not an environment strategy. It&#39;s a coin flip with a leading slash.">
+            <span class="post-num">03</span>
+            <span class="post-title">Why Your AI Platform Needs Environments, Not Just Endpoints</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/04-dont-leak-vendor-model-names.html" title="Somewhere, a model provider is about to rename a string you&#39;ve been treating as a permanent identifier. This is your warning.">
+            <span class="post-num">04</span>
+            <span class="post-title">Don&#39;t Let Vendor Model Names Leak Into Your API</span>
+            <span class="post-time">7 min read</span>
+          </a></li>
+          <li><a href="blog/posts/05-multi-cloud-iac-foundation-vs-per-resource.html" title="Someone deletes a &#39;resource.&#39; The shared networking everyone depends on goes with it. Nobody meant for this to happen. It happened anyway.">
+            <span class="post-num">05</span>
+            <span class="post-title">Multi-Cloud Infrastructure as Code: Foundation vs. Per-Resource Provisioning</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/06-secretless-provisioning-federated-identity.html" title="The most secure cloud credential is the one that expires before anyone thinks to steal it.">
+            <span class="post-num">06</span>
+            <span class="post-title">Secretless Provisioning: Federated Identity for Infrastructure-as-Code</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+        </ol>
+      </div>
+      <div class="series-part">
+        <h4><span class="part-dot" style="background: hsl(var(--part-2));"></span>Governance: Cost, Concurrency, Risk</h4>
+        <ol>
+          <li><a href="blog/posts/07-two-layer-budget-problem.html" title="Why your spend-tracking layer and your billing provider&#39;s cap are not the same system, and never should be">
+            <span class="post-num">07</span>
+            <span class="post-title">The Two-Layer Budget Problem: Soft Allocation vs. Hard Caps</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/08-self-service-limits-need-audit-trail.html" title="The moment budget approval becomes a forwardable link, you&#39;ve lost the audit trail you thought you had">
+            <span class="post-num">08</span>
+            <span class="post-title">Self-Service Limits Need an Audit Trail, Not an Email Thread</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+          <li><a href="blog/posts/09-workflow-engine-execution-id-as-lock.html" title="A trick that feels like it&#39;s cheating physics, and a couple of ways it will happily cheat you back">
+            <span class="post-num">09</span>
+            <span class="post-title">Using Your Workflow Engine&#39;s Execution ID as a Concurrency Lock</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/10-computed-outputs-need-typed-contract.html" title="A small modeling decision that either keeps your data honest or quietly lets it drift">
+            <span class="post-num">10</span>
+            <span class="post-title">Computed Outputs Deserve Their Own Typed Contract</span>
+            <span class="post-time">7 min read</span>
+          </a></li>
+          <li><a href="blog/posts/11-security-trade-off-ledger.html" title="You already have a list of security compromises you&#39;ve made. The question is whether it&#39;s written down anywhere.">
+            <span class="post-num">11</span>
+            <span class="post-title">The Security Trade-Off Ledger: Documenting Accepted Risk on Purpose</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+        </ol>
+      </div>
+      <div class="series-part">
+        <h4><span class="part-dot" style="background: hsl(var(--part-3));"></span>Agent Runtime Architecture</h4>
+        <ol>
+          <li><a href="blog/posts/12-identity-vs-instance-agent-config.html" title="Redeploying an agent shouldn&#39;t mean reintroducing yourself to everyone it knows">
+            <span class="post-num">12</span>
+            <span class="post-title">Identity vs. Instance: Why Your Agent&#39;s Config Shouldn&#39;t Live Inside Its Deployment</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+          <li><a href="blog/posts/13-machine-identity-for-agents.html" title="Nobody&#39;s watching Slack for &#39;my API key expired&#39; from a robot at 3am">
+            <span class="post-num">13</span>
+            <span class="post-title">Machine Identity for Autonomous Agents: No Human, No Shared Secret</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/14-on-behalf-of-agent-acting-as-user.html" title="One almighty service account is not an identity model, it&#39;s a liability with an API">
+            <span class="post-num">14</span>
+            <span class="post-title">On-Behalf-Of: Letting an Agent Act as the User, Not as the Platform</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+          <li><a href="blog/posts/15-memory-is-a-resource.html" title="memory_enabled=true, persistent=false — congratulations, you&#39;ve invented a Schrödinger&#39;s agent">
+            <span class="post-num">15</span>
+            <span class="post-title">Memory Is a Resource, Not an Attribute</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+          <li><a href="blog/posts/16-config-without-redeploy.html" title="If changing a timeout requires a release train, you didn&#39;t build infrastructure, you built a very slow form">
+            <span class="post-num">16</span>
+            <span class="post-title">Config That Changes Without a Redeploy: Env Vars and Protocol as Runtime Concerns</span>
+            <span class="post-time">7 min read</span>
+          </a></li>
+          <li><a href="blog/posts/17-tool-servers-deserve-own-resource-type.html" title="It&#39;s not an agent that happens to expose tools. It&#39;s infrastructure wearing a disguise.">
+            <span class="post-num">17</span>
+            <span class="post-title">Tool Servers Deserve Their Own Resource Type</span>
+            <span class="post-time">7 min read</span>
+          </a></li>
+        </ol>
+      </div>
+      <div class="series-part">
+        <h4><span class="part-dot" style="background: hsl(var(--part-4));"></span>Operating It at Scale</h4>
+        <ol>
+          <li><a href="blog/posts/18-threat-model-at-the-edge-of-llm-gateway.html" title="Your WAF has never read a system prompt, and that&#39;s the problem">
+            <span class="post-num">18</span>
+            <span class="post-title">The Threat Model at the Edge of an LLM Gateway</span>
+            <span class="post-time">9 min read</span>
+          </a></li>
+          <li><a href="blog/posts/19-component-prefixed-versioning.html" title="What&#39;s actually running in production shouldn&#39;t require an archaeology degree">
+            <span class="post-num">19</span>
+            <span class="post-title">Component-Prefixed Versioning for a Multi-Binary Platform</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+          <li><a href="blog/posts/20-dont-bolt-on-observability-fork-it.html" title="Your analytics pipeline having a bad day should be its own problem, not everyone&#39;s">
+            <span class="post-num">20</span>
+            <span class="post-title">Don&#39;t Bolt Observability Onto the Request Path — Fork It</span>
+            <span class="post-time">8 min read</span>
+          </a></li>
+        </ol>
+      </div>
+      <div class="series-part">
+        <h4><span class="part-dot" style="background: hsl(var(--part-5));"></span>Capstone</h4>
+        <ol>
+          <li><a href="blog/posts/21-capstone-what-wed-do-differently.html" title="A retrospective, not a victory lap">
+            <span class="post-num">21</span>
+            <span class="post-title">What We&#39;d Do Differently: Patterns That Held Up and Ones That Didn&#39;t</span>
+            <span class="post-time">13 min read</span>
+          </a></li>
+        </ol>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ Research -->
+<section class="home-section" id="research">
+  <div class="container">
+    <div class="section-heading">
+      <h2>Research &amp; publications</h2>
+      <p>Theory of Mind in LLMs, privacy-preserving ML, and computational social science.</p>
+    </div>
+    <ol class="pub-list">
+      <li>
+        <span class="pub-year">2025</span>
+        <div>
+          <h3>Leveraging Explainable AI for Drug Efficacy and Mortality Analysis: Insights from an Observational Dataset</h3>
+          <p class="pub-venue">Medinformatics Journal</p>
+          <p class="pub-authors">Shetty MK, Mozumdar A, <strong>Gupta S</strong>, Gupta L, Chaudhary K, Roy V, Kumar S, Kalra BS, Khanth PE S, Gupta A.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2024</span>
+        <div>
+          <h3><a href="https://doi.org/10.1038/s41562-024-01882-z" target="_blank" rel="noopener">Testing Theory of Mind in Large Language Models and Humans</a></h3>
+          <p class="pub-venue">Nature Human Behaviour</p>
+          <p class="pub-authors">Strachan JWA, Albergo D, Borghini G, Pansardi O, Scaliti E, <strong>Gupta S</strong>, Saxena K, Rufo A, Panzeri S, Manzi G, Graziano MSA, Becchio C.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2022</span>
+        <div>
+          <h3><a href="https://doi.org/10.1007/s40012-022-00350-1" target="_blank" rel="noopener">Differential Privacy: A privacy cloak for preserving utility in heterogeneous datasets</a></h3>
+          <p class="pub-venue">CSI Transactions on ICT</p>
+          <p class="pub-authors"><strong>Gupta S</strong>, Buduru AB, Kumaraguru P.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2021</span>
+        <div>
+          <h3><a href="https://doi.org/10.1145/3465336.3475111" target="_blank" rel="noopener">“A Virus Has No Religion”: Analyzing Islamophobia on Twitter During the COVID-19 Outbreak</a></h3>
+          <p class="pub-venue">ACM Conference on Hypertext and Social Media (HT ’21)</p>
+          <p class="pub-authors">Chandra M, Reddy M, Sehgal S, <strong>Gupta S</strong>, Buduru AB, Kumaraguru P.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2020</span>
+        <div>
+          <h3><a href="https://doi.org/10.18653/v1/2020.nlpcss-1.7" target="_blank" rel="noopener">Viable Threat on News Reading: Generating Biased News Using Natural Language Models</a></h3>
+          <p class="pub-venue">NLP+CSS Workshop at EMNLP</p>
+          <p class="pub-authors"><strong>Gupta S</strong>, Nguyen HH, Yamagishi J, Echizen I.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2020</span>
+        <div>
+          <h3><a href="https://doi.org/10.1109/SMDS49396.2020.00018" target="_blank" rel="noopener">Multi-objective Reinforcement Learning based approach for User-Centric Power Optimization in Smart Home Environments</a></h3>
+          <p class="pub-venue">IEEE International Conference on Smart Data Services (SMDS)</p>
+          <p class="pub-authors"><strong>Gupta S</strong>, Bhambri S, Dhingra K, Buduru AB, Kumaraguru P.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2020</span>
+        <div>
+          <h3><a href="https://doi.org/10.1109/TPS-ISA50397.2020.00019" target="_blank" rel="noopener">imdpGAN: Generating Private and Specific Data with Generative Adversarial Networks</a></h3>
+          <p class="pub-venue">IEEE TPS-ISA</p>
+          <p class="pub-authors"><strong>Gupta S</strong>, Buduru AB, Kumaraguru P.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2020</span>
+        <div>
+          <h3><a href="https://doi.org/10.1109/BigMM50055.2020.00038" target="_blank" rel="noopener">Hashtags Are (Not) Judgemental: The Untold Story of Lok Sabha Elections 2019</a></h3>
+          <p class="pub-venue">IEEE International Conference on Multimedia Big Data (BigMM)</p>
+          <p class="pub-authors"><strong>Gupta S</strong>, Singh AK, Buduru AB, Kumaraguru P.</p>
+        </div>
+      </li>
+      <li>
+        <span class="pub-year">2020</span>
+        <div>
+          <h3><a href="https://doi.org/10.1007/978-3-030-60975-7_4" target="_blank" rel="noopener">#IVoted to #IGotPwned: Studying Voter Privacy Leaks in Indian Lok Sabha Elections on Twitter</a></h3>
+          <p class="pub-venue">International Conference on Social Informatics (SocInfo)</p>
+          <p class="pub-authors"><strong>Gupta S</strong>, Agarwal A, Vyalla S, Buduru AB, Kumaraguru P.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ Skills -->
+<section class="home-section" id="skills">
+  <div class="container">
+    <div class="section-heading">
+      <h2>Skills</h2>
+      <p>The toolkit behind the work above.</p>
+    </div>
+    <div class="skill-grid">
+      <div class="skill-group">
+        <h3>AI/ML &amp; GenAI</h3>
+        <p class="skill-pills"><span class="pill">LLMs</span><span class="pill">Agentic systems</span><span class="pill">RAG</span><span class="pill">Fine-tuning (LoRA, PEFT)</span><span class="pill">Tool use</span><span class="pill">Multi-modal AI</span><span class="pill">LLM evals &amp; guardrails</span><span class="pill">Reinforcement learning</span></p>
+      </div>
+      <div class="skill-group">
+        <h3>LLM frameworks</h3>
+        <p class="skill-pills"><span class="pill">LangChain</span><span class="pill">LangGraph</span><span class="pill">LlamaIndex</span><span class="pill">HuggingFace</span><span class="pill">vLLM</span><span class="pill">Claude</span><span class="pill">Gemini</span><span class="pill">OpenAI</span><span class="pill">MCP</span></p>
+      </div>
+      <div class="skill-group">
+        <h3>ML/DL</h3>
+        <p class="skill-pills"><span class="pill">PyTorch</span><span class="pill">TensorFlow</span><span class="pill">scikit-learn</span><span class="pill">XGBoost</span><span class="pill">mlpack</span><span class="pill">SDV</span></p>
+      </div>
+      <div class="skill-group">
+        <h3>MLOps &amp; LLMOps</h3>
+        <p class="skill-pills"><span class="pill">Model deployment</span><span class="pill">CI/CD for ML</span><span class="pill">Monitoring</span><span class="pill">Prompt versioning</span><span class="pill">Vector DBs</span><span class="pill">Cost &amp; latency optimization</span></p>
+      </div>
+      <div class="skill-group">
+        <h3>Cloud &amp; infrastructure</h3>
+        <p class="skill-pills"><span class="pill">AWS</span><span class="pill">Google Cloud / Vertex AI</span><span class="pill">Docker</span><span class="pill">Kubernetes</span><span class="pill">Serverless</span></p>
+      </div>
+      <div class="skill-group">
+        <h3>Backend &amp; languages</h3>
+        <p class="skill-pills"><span class="pill">Python</span><span class="pill">TypeScript</span><span class="pill">SQL</span><span class="pill">FastAPI</span><span class="pill">Django</span><span class="pill">Node.js</span><span class="pill">MongoDB</span><span class="pill">Elasticsearch</span></p>
+      </div>
+    </div>
+
+    <div class="cred-grid">
+      <div class="cred-card">
+        <h3>Certifications</h3>
+        <ul>
+          <li>Google Cloud Certified Professional Machine Learning Engineer</li>
+          <li>Anthropic Claude Certified Professional</li>
+        </ul>
+      </div>
+      <div class="cred-card">
+        <h3>Education</h3>
+        <ul>
+          <li><strong>M.Tech., specialization in AI</strong><br>Indraprastha Institute of Information Technology, Delhi</li>
+          <li><strong>B.Tech., IT &amp; Mathematical Innovations</strong><br>Cluster Innovation Centre, University of Delhi</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ Life events -->
+<!-- To add an event, copy a <li class="life-event"> block into the right year.
+     Kinds with their own color: life-career, life-research, life-education,
+     life-writing, life-open (source), life-personal. -->
+<section class="home-section" id="life">
+  <div class="container">
+    <div class="section-heading">
+      <h2>Life events</h2>
+      <p>The milestones between the job titles.</p>
+    </div>
+    <ol class="life-list">
+      <li class="life-year">
+        <h3>2026</h3>
+        <ol>
+          <li class="life-event life-career">
+            <span class="life-kind">Career</span>
+            <h4>Joined Maersk</h4>
+            <p>Started building MIDAS, Maersk's enterprise GenAI platform.</p>
+          </li>
+          <li class="life-event life-writing">
+            <span class="life-kind">Writing</span>
+            <h4>Started the blog series</h4>
+            <p>Began writing a 21-part series on building enterprise AI platforms.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2025</h3>
+        <ol>
+          <li class="life-event life-career">
+            <span class="life-kind">Career</span>
+            <h4>Worked with Google</h4>
+            <p>Joined the Google Extended Workforce via Cloudsufi and shipped indiadatacommons.org.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2024</h3>
+        <ol>
+          <li class="life-event life-research">
+            <span class="life-kind">Research</span>
+            <h4>Published in Nature Human Behaviour</h4>
+            <p>Co-authored “Testing Theory of Mind in Large Language Models and Humans”.</p>
+          </li>
+          <li class="life-event life-career">
+            <span class="life-kind">Career</span>
+            <h4>Went independent</h4>
+            <p>Began consulting as an AI Solution Architect, starting with Indeep AI in Spain.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2022</h3>
+        <ol>
+          <li class="life-event life-education">
+            <span class="life-kind">Education</span>
+            <h4>Wrapped up IIIT-Delhi</h4>
+            <p>Finished four years of AI and privacy research at Precog.</p>
+          </li>
+          <li class="life-event life-career">
+            <span class="life-kind">Career</span>
+            <h4>Joined Pitney Bowes</h4>
+            <p>Moved into industry as an Advisory Data Scientist in Noida.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2021</h3>
+        <ol>
+          <li class="life-event life-career">
+            <span class="life-kind">Career</span>
+            <h4>Interned at Amazon</h4>
+            <p>Spent six months as an Applied Scientist Intern in Bangalore.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2020</h3>
+        <ol>
+          <li class="life-event life-research">
+            <span class="life-kind">Research</span>
+            <h4>Five papers in one year</h4>
+            <p>Published at EMNLP workshops, IEEE and SocInfo on privacy, elections and NLP.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2018</h3>
+        <ol>
+          <li class="life-event life-education">
+            <span class="life-kind">Education</span>
+            <h4>Started at IIIT-Delhi</h4>
+            <p>Joined the Precog research group for an M.Tech. in AI.</p>
+          </li>
+        </ol>
+      </li>
+      <li class="life-year">
+        <h3>2017</h3>
+        <ol>
+          <li class="life-event life-open">
+            <span class="life-kind">Open source</span>
+            <h4>Google Summer of Code</h4>
+            <p>Contributed CI/CD and Docker infrastructure to mlpack.</p>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================ Contact -->
+<section class="home-section home-contact" id="contact">
+  <div class="container">
+    <h2>Let's talk</h2>
+    <p>For discussions and collaborations, reach out at <a href="mailto:saurabhgupta3012@gmail.com">saurabhgupta3012@gmail.com</a> — let's see how we can help each other.</p>
+    <p class="home-support">If my research has been useful, you can <a href="https://www.buymeacoffee.com/saurabh" target="_blank" rel="noopener">buy me a coffee</a> or support via <a href="https://paypal.me/reallysaurabh?locale.x=en_GB" target="_blank" rel="noopener">PayPal</a>.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>© Saurabh Gupta</span>
+    <span><a href="blog/index.html">Blog</a> · <a href="https://www.linkedin.com/in/saurabhgupta3012/" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/reallysaurabh" target="_blank" rel="noopener">GitHub</a></span>
+  </div>
+</footer>
+
+<script src="blog/assets/js/main.js"></script>
+</body>
+</html>

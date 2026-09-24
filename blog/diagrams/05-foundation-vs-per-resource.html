@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Foundation vs. Per-Resource Provisioning</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; background: #fafafa; color: #1a1a1a; margin: 0; padding: 32px; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .caption { color: #666; font-size: 13px; margin-bottom: 20px; }
+  svg { width: 100%; height: auto; background: #ffffff; border: 1px solid #e2e2e2; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Layered Provisioning: Foundation vs. Per-Resource</h1>
+  <div class="caption">Per-resource stacks reference the foundation layer but cannot create or destroy it. A failed per-resource provision rolls back via compensation, never touching the layer below.</div>
+  <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow4" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444" />
+      </marker>
+      <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#b03a3a" />
+      </marker>
+    </defs>
+
+    <!-- per-resource layer -->
+    <text x="450" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#444">PER-RESOURCE LAYER — frequently created / destroyed</text>
+    <rect x="60" y="45" width="150" height="60" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="135" y="72" text-anchor="middle" font-size="12">Model deploy A</text>
+    <text x="135" y="90" text-anchor="middle" font-size="10.5" fill="#555">step 1 → step 2</text>
+
+    <rect x="240" y="45" width="150" height="60" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="315" y="72" text-anchor="middle" font-size="12">Agent runtime B</text>
+    <text x="315" y="90" text-anchor="middle" font-size="10.5" fill="#555">step 1 → step 2</text>
+
+    <rect x="420" y="45" width="150" height="60" rx="8" fill="#faeeee" stroke="#b03a3a"/>
+    <text x="495" y="68" text-anchor="middle" font-size="12">Pipeline run C</text>
+    <text x="495" y="84" text-anchor="middle" font-size="10.5" fill="#8f2c2c">step 2 FAILS</text>
+    <text x="495" y="98" text-anchor="middle" font-size="10" fill="#8f2c2c">→ compensate step 1</text>
+
+    <rect x="600" y="45" width="150" height="60" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="675" y="72" text-anchor="middle" font-size="12">Resource D</text>
+    <text x="675" y="90" text-anchor="middle" font-size="10.5" fill="#555">step 1 → step 2</text>
+
+    <!-- rollback arrow -->
+    <path d="M 495 105 C 495 130, 495 130, 495 150" stroke="#b03a3a" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+    <text x="560" y="130" font-size="10.5" fill="#8f2c2c">compensation rolls back,</text>
+    <text x="560" y="143" font-size="10.5" fill="#8f2c2c">stays within this resource</text>
+
+    <!-- reference arrows down to foundation -->
+    <line x1="135" y1="105" x2="200" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
+    <line x1="315" y1="105" x2="360" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
+    <line x1="495" y1="160" x2="500" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
+    <line x1="675" y1="105" x2="650" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
+    <text x="450" y="200" text-anchor="middle" font-size="11" fill="#888">reads / references only — never creates or deletes</text>
+
+    <!-- foundation layer -->
+    <rect x="60" y="235" width="780" height="130" rx="10" fill="#f4f4f4" stroke="#666" stroke-width="2"/>
+    <text x="450" y="260" text-anchor="middle" font-size="14" font-weight="700" fill="#333">FOUNDATION LAYER — provisioned once, long-lived</text>
+    <rect x="90" y="280" width="220" height="60" rx="6" fill="#e6e6e6" stroke="#666"/>
+    <text x="200" y="308" text-anchor="middle" font-size="12">Shared networking</text>
+    <text x="200" y="324" text-anchor="middle" font-size="10.5" fill="#555">provisioned per account/region</text>
+
+    <rect x="340" y="280" width="220" height="60" rx="6" fill="#e6e6e6" stroke="#666"/>
+    <text x="450" y="308" text-anchor="middle" font-size="12">Base IAM &amp; federation trust</text>
+    <text x="450" y="324" text-anchor="middle" font-size="10.5" fill="#555">reviewed, changed rarely</text>
+
+    <rect x="590" y="280" width="220" height="60" rx="6" fill="#e6e6e6" stroke="#666"/>
+    <text x="700" y="308" text-anchor="middle" font-size="12">Account-level scaffolding</text>
+    <text x="700" y="324" text-anchor="middle" font-size="10.5" fill="#555">exists before demand does</text>
+
+    <text x="450" y="400" text-anchor="middle" font-size="12" fill="#8f2c2c" font-weight="600">Deleting a per-resource stack must never reach this layer.</text>
+  </svg>
+</div>
+</body>
+</html>

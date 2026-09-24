@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Identity Federation: Google vs. Azure</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; background: #fafafa; color: #1a1a1a; margin: 0; padding: 32px; }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .caption { color: #666; font-size: 13px; margin-bottom: 20px; }
+  svg { width: 100%; height: auto; background: #ffffff; border: 1px solid #e2e2e2; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Two Paths to the Same Destination: Agent Identity Federation</h1>
+  <div class="caption">Both paths end with a short-lived, cloud-native credential and no long-lived secret in sight — the divergence is in the middle.</div>
+  <svg viewBox="0 0 920 460" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444" />
+      </marker>
+    </defs>
+
+    <!-- Start node -->
+    <rect x="360" y="20" width="200" height="50" rx="8" fill="#1a1a1a" />
+    <text x="460" y="50" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Agent needs to call a service</text>
+
+    <!-- connectors down to two columns -->
+    <line x1="460" y1="70" x2="460" y2="95" stroke="#444" stroke-width="2"/>
+    <line x1="460" y1="95" x2="220" y2="95" stroke="#444" stroke-width="2"/>
+    <line x1="460" y1="95" x2="700" y2="95" stroke="#444" stroke-width="2"/>
+    <line x1="220" y1="95" x2="220" y2="115" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="700" y1="95" x2="700" y2="115" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Column headers -->
+    <text x="220" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#1a73e8">GOOGLE WORKSPACE / GCP</text>
+    <text x="700" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#0078d4">MICROSOFT 365 / AZURE</text>
+
+    <!-- GCP column boxes -->
+    <rect x="110" y="130" width="220" height="55" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="220" y="153" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Presents external identity token</text>
+    <text x="220" y="171" text-anchor="middle" font-size="11" fill="#555">(e.g. K8s / OIDC token)</text>
+
+    <line x1="220" y1="185" x2="220" y2="205" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="110" y="210" width="220" height="55" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="220" y="233" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Workload Identity Federation</text>
+    <text x="220" y="251" text-anchor="middle" font-size="11" fill="#555">exchanges token, no stored secret</text>
+
+    <line x1="220" y1="265" x2="220" y2="285" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="110" y="290" width="220" height="55" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="220" y="313" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Impersonates service account</text>
+    <text x="220" y="331" text-anchor="middle" font-size="11" fill="#555">scoped permissions apply</text>
+
+    <!-- Azure column boxes -->
+    <rect x="590" y="130" width="220" height="55" rx="8" fill="#e5f1fb" stroke="#0078d4"/>
+    <text x="700" y="153" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Presents workload credential</text>
+    <text x="700" y="171" text-anchor="middle" font-size="11" fill="#555">(e.g. K8s service acct token)</text>
+
+    <line x1="700" y1="185" x2="700" y2="205" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="590" y="210" width="220" height="55" rx="8" fill="#e5f1fb" stroke="#0078d4"/>
+    <text x="700" y="233" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Entra ID federated credential</text>
+    <text x="700" y="251" text-anchor="middle" font-size="11" fill="#555">exchanges token, no stored secret</text>
+
+    <line x1="700" y1="265" x2="700" y2="285" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="590" y="290" width="220" height="55" rx="8" fill="#e5f1fb" stroke="#0078d4"/>
+    <text x="700" y="313" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Managed Identity assumed</text>
+    <text x="700" y="331" text-anchor="middle" font-size="11" fill="#555">scoped RBAC role applies</text>
+
+    <!-- reconverge -->
+    <line x1="220" y1="345" x2="220" y2="375" stroke="#444" stroke-width="2"/>
+    <line x1="700" y1="345" x2="700" y2="375" stroke="#444" stroke-width="2"/>
+    <line x1="220" y1="375" x2="700" y2="375" stroke="#444" stroke-width="2"/>
+    <line x1="460" y1="375" x2="460" y2="395" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="330" y="400" width="260" height="50" rx="8" fill="#1a1a1a"/>
+    <text x="460" y="430" text-anchor="middle" fill="#fff" font-size="13.5" font-weight="600">Short-lived credential, zero secrets stored</text>
+  </svg>
+</div>
+</body>
+</html>

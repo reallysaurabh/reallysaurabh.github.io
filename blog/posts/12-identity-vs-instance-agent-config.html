@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identity vs. Instance: Why Your Agent&#39;s Config Shouldn&#39;t Live Inside Its Deployment — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="Redeploying an agent shouldn&#39;t mean reintroducing yourself to everyone it knows">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-3);">
+          <p class="post-eyebrow">Agent Runtime Architecture · Post 12 of 21</p>
+          <h1>Identity vs. Instance: Why Your Agent&#39;s Config Shouldn&#39;t Live Inside Its Deployment</h1>
+          <p class="post-subtitle">Redeploying an agent shouldn&#39;t mean reintroducing yourself to everyone it knows</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>8 min read</span>
+            <span>1,161 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>Here&#39;s a question that sounds trivial until you&#39;ve been burned by it: when you redeploy an agent, does it wake up as the same agent, or as a stranger wearing its clothes?</p>
+<p>If your platform models &quot;an agent&quot; as a single resource — one row, one deployment, one everything — the honest answer is: a stranger. You just torn down the only place its identity lived and stood up a new one that happens to share a name. Every permission grant, every accrued piece of context, every downstream system that was told &quot;this is Agent X, trust it&quot; — gone, and quietly re-created from a template, if you&#39;re lucky enough to have a template.</p>
+<h2 id="the-coupling-nobody-notices-until-it-hurts">The Coupling Nobody Notices Until It Hurts</h2>
+<p>Most platforms don&#39;t set out to make this mistake. It happens by accretion. You start with an agent as a deployable thing — a container, a runtime, a process — because that&#39;s the part you can see running. Identity gets bolted on: an API key here, an IAM role there, maybe a database row that also happens to hold the deployment config. It all lives in one resource because, early on, one resource is all you have.</p>
+<p>Then the platform matures. You need to redeploy an agent to bump its model version, or roll out a config change, or recover from a crashed instance. And now you discover that &quot;redeploy&quot; and &quot;reissue the agent&#39;s entire identity&quot; are the same operation, because you never separated them.</p>
+<p>This is the practical cost:</p>
+<ul>
+<li><strong>Permissions evaporate.</strong> If an agent&#39;s access grants were tied to the deployment rather than to a durable identity, every redeploy is a permissions outage until someone re-grants everything.</li>
+<li><strong>Audit trails snap in half.</strong> &quot;Agent X did this three weeks ago&quot; and &quot;Agent X did this five minutes ago&quot; turn out to refer to two unrelated deployments that never shared so much as a UUID.</li>
+<li><strong>Downstream trust breaks.</strong> Any system that authenticated the agent by its deployment-specific credential now has to be told, again, that the &quot;new&quot; agent is actually the same one it already trusted.</li>
+<li><strong>State and memory vanish</strong>, which — if you&#39;ve been following this series — is its own architectural sin (more on that two posts from now).</li>
+</ul>
+<h2 id="split-the-resource-on-purpose">Split the Resource on Purpose</h2>
+<p>The fix is not exotic. It&#39;s the same lesson every mature system eventually relearns: separate the thing that <em>is</em> from the thing that <em>runs</em>.</p>
+<p><strong>Agent identity</strong> is the stable layer. It&#39;s created once, holds a durable set of attributes — a name, an owner, accrued permissions, a place for durable memory to attach, an audit history — and critically, it holds no live infrastructure of its own. It cannot crash. It cannot need a restart. It is a record, not a process.</p>
+<p><strong>Runtime instance</strong> is the disposable layer. It&#39;s the actual deployed thing — the container, the process, the compute — created against a specific version of config, torn down and recreated freely. Redeploy, scale, recover from a crash, roll back a bad release: all of that happens entirely at the instance layer and never touches identity.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#6366f1"/>
+      </marker>
+      <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#9ca3af"/>
+      </marker>
+    </defs>
+
+    <!-- Identity box -->
+    <rect x="310" y="20" width="240" height="70" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+    <text x="430" y="48" text-anchor="middle" font-size="15" font-weight="600" fill="#312e81">Agent Identity</text>
+    <text x="430" y="68" text-anchor="middle" font-size="11" fill="#4338ca">permissions · memory · audit history</text>
+
+    <!-- vertical spine -->
+    <line x1="430" y1="90" x2="430" y2="130" stroke="#6366f1" stroke-width="2"/>
+
+    <!-- Instance v1 (destroyed) -->
+    <rect x="60" y="180" width="200" height="70" rx="10" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5,4"/>
+    <text x="160" y="210" text-anchor="middle" font-size="14" fill="#6b7280" text-decoration="line-through">Runtime v1</text>
+    <text x="160" y="228" text-anchor="middle" font-size="11" fill="#9ca3af">torn down</text>
+
+    <!-- Instance v2 (destroyed) -->
+    <rect x="330" y="180" width="200" height="70" rx="10" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2" stroke-dasharray="5,4"/>
+    <text x="430" y="210" text-anchor="middle" font-size="14" fill="#6b7280" text-decoration="line-through">Runtime v2</text>
+    <text x="430" y="228" text-anchor="middle" font-size="11" fill="#9ca3af">torn down</text>
+
+    <!-- Instance v3 (current) -->
+    <rect x="600" y="180" width="200" height="70" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="700" y="210" text-anchor="middle" font-size="14" font-weight="600" fill="#065f46">Runtime v3</text>
+    <text x="700" y="228" text-anchor="middle" font-size="11" fill="#059669">current, live</text>
+
+    <!-- connecting lines from spine to each instance -->
+    <path d="M430,130 C430,150 160,150 160,180" fill="none" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+    <path d="M430,130 L430,180" fill="none" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+    <path d="M430,130 C430,150 700,150 700,180" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- timeline arrow -->
+    <line x1="60" y1="300" x2="800" y2="300" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrowGray)"/>
+    <text x="60" y="322" font-size="11" fill="#9ca3af">t0: deploy</text>
+    <text x="330" y="322" font-size="11" fill="#9ca3af">t1: redeploy</text>
+    <text x="600" y="322" font-size="11" fill="#059669">t2: redeploy again — identity unaffected</text>
+  </svg></div><figcaption>it shows a single stable &quot;Agent Identity&quot; box with a sequence of &quot;Runtime Instance&quot; boxes underneath it over time (v1 torn down, v2 created, v3 current), each one pointing back to the same identity.</figcaption><a class="diagram-standalone-link" href="../diagrams/12-identity-vs-instance.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<p>Once you draw this line, a redeploy stops being an identity crisis. You tear down instance v2, stand up instance v3, and instance v3 points at the exact same identity record v1 and v2 did. Permissions didn&#39;t move because they were never attached to the instance. The audit trail is continuous because the identity that&#39;s being audited never changed. Nothing downstream needs to be told anything new, because as far as they&#39;re concerned, nothing happened — the agent they trust is still the agent they trust.</p>
+<h2 id="a-small-concrete-example">A Small, Concrete Example</h2>
+<p>Picture a 200-engineer logistics company running an internal agent that reconciles shipment exceptions against a claims system. It&#39;s been running for four months, has an accrued set of read/write grants to three internal systems, and — because someone finally listened to post 15 in this series — a durable memory store of past exception patterns it&#39;s learned to recognize.</p>
+<p>Now the team wants to bump it to a newer model version. If identity and instance are one resource, this &quot;routine model bump&quot; requires re-provisioning every downstream grant, reconnecting the memory store, and hoping the audit system&#39;s foreign keys don&#39;t mind that the agent effectively just died and was reborn. If they&#39;re split, the team deploys a new instance against the existing identity, the grants and memory were never touched, and the &quot;big scary model upgrade&quot; is, from every other system&#39;s point of view, a non-event.</p>
+<p>That gap — between &quot;routine deploy&quot; and &quot;identity crisis&quot; — is the entire value of the split.</p>
+<h2 id="where-we39re-still-not-sure">Where We&#39;re Still Not Sure</h2>
+<p>One thing we&#39;ve gone back and forth on: how much <em>should</em> survive a redeploy versus reset cleanly. Permissions and audit history, clearly, should survive. But should an in-flight task survive a redeploy, or is &quot;finish or cleanly fail, then redeploy&quot; the safer default? We&#39;ve landed on the latter for now, mostly because resuming mid-task across a version boundary opens questions about state compatibility we didn&#39;t want to solve on day one. It&#39;s not obviously the right call, and if you&#39;ve drawn that line differently, we&#39;d genuinely like to compare notes.</p>
+<h2 id="a-few-things-that-tripped-us-up">A Few Things That Tripped Us Up</h2>
+<p><strong>Watch for the instance leaking into the identity.</strong> The temptation, once you&#39;ve made the split, is to let convenience win — &quot;let&#39;s just cache the current runtime&#39;s endpoint on the identity record for quick lookups.&quot; Resist it. The moment identity holds a live pointer to a specific instance, you&#39;ve reintroduced the coupling through the back door, and your next redeploy will go looking for a phantom.</p>
+<p><strong>We&#39;d also flag: keep identity cheap to create.</strong> The identity layer works best when it&#39;s boring to provision — a name, an owner, an empty slate for permissions and memory to attach to later. If provisioning an identity requires the same approval workflow as a production database, people tend to start reusing identities across unrelated agents just to skip the paperwork, which quietly undoes the whole benefit.</p>
+<p><strong>And &quot;stable&quot; doesn&#39;t have to mean &quot;immutable.&quot;</strong> Identity attributes like ownership or permission grants absolutely change over time in our experience — what&#39;s stable is that they change independently of, and survive, any given deployment.</p>
+<p>This split underpinned a lot of what came after for us: durable permissions, continuous audit trails, and — as the next post gets into — an identity an agent can actually prove it holds, without a human standing behind it holding a shared secret. We&#39;re curious whether other teams have found a lighter-weight way to get the same guarantees — if so, tell us how.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #AIAgents #SoftwareArchitecture #CloudArchitecture #AgentArchitecture</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#AIGovernance</span><span class="pill">#PlatformEngineering</span><span class="pill">#AIAgents</span><span class="pill">#SoftwareArchitecture</span><span class="pill">#CloudArchitecture</span><span class="pill">#AgentArchitecture</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="11-security-trade-off-ledger.html"><span class="pager-direction">← Previous</span><span class="pager-title">The Security Trade-Off Ledger: Documenting Accepted Risk on Purpose</span></a>
+    <a class="pager-link next" href="13-machine-identity-for-agents.html"><span class="pager-direction">Next →</span><span class="pager-title">Machine Identity for Autonomous Agents: No Human, No Shared Secret</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#the-coupling-nobody-notices-until-it-hurts">The Coupling Nobody Notices Until It Hurts</a></li>
+      <li><a href="#split-the-resource-on-purpose">Split the Resource on Purpose</a></li>
+      <li><a href="#a-small-concrete-example">A Small, Concrete Example</a></li>
+      <li><a href="#where-we39re-still-not-sure">Where We&amp;#39;re Still Not Sure</a></li>
+      <li><a href="#a-few-things-that-tripped-us-up">A Few Things That Tripped Us Up</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

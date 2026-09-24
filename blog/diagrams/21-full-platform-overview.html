@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Enterprise AI Platform — Full Architecture Overview</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fafafa; margin: 0; padding: 32px; color: #1a1a1a; }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.caption { color: #666; font-size: 14px; margin: 0 0 20px; }
+  svg { width: 100%; height: auto; display: block; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The Whole Platform, End to End</h1>
+  <p class="caption">Every pattern from the series, assembled into one picture: environments, identity &amp; secrets, agent runtime, the LLM gateway's layered edge defense, and the observability fork.</p>
+  <svg viewBox="0 0 1400 1020" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+      </marker>
+      <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#999"/>
+      </marker>
+    </defs>
+
+    <!-- ============ ZONE A: ENVIRONMENTS ============ -->
+    <text x="20" y="18" font-size="13" font-weight="700" fill="#444">ENVIRONMENTS</text>
+
+    <!-- Dev lane -->
+    <rect x="20" y="26" width="440" height="215" rx="10" fill="#f7faf7" stroke="#bcd9bc"/>
+    <text x="240" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#2c6e2f">DEV</text>
+    <rect x="40" y="56" width="400" height="42" rx="6" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="240" y="81" text-anchor="middle" font-size="11.5" font-weight="600" fill="#274b7a">Control Plane</text>
+    <rect x="40" y="106" width="400" height="42" rx="6" fill="#f5f0ff" stroke="#a98fd6"/>
+    <text x="240" y="131" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b3a91">Model Registry</text>
+    <rect x="40" y="156" width="400" height="42" rx="6" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="240" y="181" text-anchor="middle" font-size="11.5" font-weight="600" fill="#7a4a1a">Budget Layer (soft allocation)</text>
+
+    <!-- Staging lane -->
+    <rect x="480" y="26" width="440" height="215" rx="10" fill="#f7faf7" stroke="#bcd9bc"/>
+    <text x="700" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#2c6e2f">STAGING</text>
+    <rect x="500" y="56" width="400" height="42" rx="6" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="700" y="81" text-anchor="middle" font-size="11.5" font-weight="600" fill="#274b7a">Control Plane</text>
+    <rect x="500" y="106" width="400" height="42" rx="6" fill="#f5f0ff" stroke="#a98fd6"/>
+    <text x="700" y="131" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b3a91">Model Registry</text>
+    <rect x="500" y="156" width="400" height="42" rx="6" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="700" y="181" text-anchor="middle" font-size="11.5" font-weight="600" fill="#7a4a1a">Budget Layer (soft allocation)</text>
+
+    <!-- Prod lane -->
+    <rect x="940" y="26" width="440" height="215" rx="10" fill="#f7faf7" stroke="#bcd9bc"/>
+    <text x="1160" y="46" text-anchor="middle" font-size="13" font-weight="700" fill="#2c6e2f">PROD</text>
+    <rect x="960" y="56" width="400" height="42" rx="6" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="1160" y="81" text-anchor="middle" font-size="11.5" font-weight="600" fill="#274b7a">Control Plane</text>
+    <rect x="960" y="106" width="400" height="42" rx="6" fill="#f5f0ff" stroke="#a98fd6"/>
+    <text x="1160" y="131" text-anchor="middle" font-size="11.5" font-weight="600" fill="#5b3a91">Model Registry</text>
+    <rect x="960" y="156" width="400" height="42" rx="6" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="1160" y="181" text-anchor="middle" font-size="11.5" font-weight="600" fill="#7a4a1a">Budget Layer (hard cap enforced)</text>
+
+    <text x="1305" y="120" font-size="10.5" fill="#888" text-anchor="middle" transform="rotate(90 1305 120)"></text>
+
+    <!-- connectors down to identity layer -->
+    <line x1="240" y1="241" x2="240" y2="270" stroke="#999" stroke-width="1.6" marker-end="url(#a2)"/>
+    <line x1="700" y1="241" x2="700" y2="270" stroke="#999" stroke-width="1.6" marker-end="url(#a2)"/>
+    <line x1="1160" y1="241" x2="1160" y2="270" stroke="#999" stroke-width="1.6" marker-end="url(#a2)"/>
+
+    <!-- ============ ZONE B: IDENTITY & SECRETS ============ -->
+    <rect x="20" y="276" width="1360" height="80" rx="10" fill="#fef7f7" stroke="#e8b4b4"/>
+    <text x="40" y="298" font-size="13" font-weight="700" fill="#8a3a3a">IDENTITY &amp; SECRETS LAYER</text>
+    <rect x="40" y="306" width="650" height="38" rx="6" fill="#ffffff" stroke="#e8b4b4"/>
+    <text x="365" y="330" text-anchor="middle" font-size="11.5" font-weight="600" fill="#8a3a3a">Federated Identity (workload / on-behalf-of)</text>
+    <rect x="710" y="306" width="650" height="38" rx="6" fill="#ffffff" stroke="#e8b4b4"/>
+    <text x="1035" y="330" text-anchor="middle" font-size="11.5" font-weight="600" fill="#8a3a3a">Secrets Store (Key Vault / Secret Manager / Vault)</text>
+
+    <line x1="700" y1="356" x2="700" y2="385" stroke="#999" stroke-width="1.6" marker-end="url(#a2)"/>
+
+    <!-- ============ ZONE C: AGENT RUNTIME ============ -->
+    <rect x="20" y="392" width="1360" height="165" rx="10" fill="#f7f5fb" stroke="#c9b8e8"/>
+    <text x="40" y="414" font-size="13" font-weight="700" fill="#5b3a91">AGENT RUNTIME ARCHITECTURE</text>
+
+    <rect x="40" y="424" width="300" height="115" rx="6" fill="#ffffff" stroke="#c9b8e8"/>
+    <text x="190" y="450" text-anchor="middle" font-size="12" font-weight="700" fill="#5b3a91">Agent Identity</text>
+    <text x="190" y="466" text-anchor="middle" font-size="10.5" fill="#666">(config, created once,</text>
+    <text x="190" y="480" text-anchor="middle" font-size="10.5" fill="#666">no live infra)</text>
+
+    <line x1="340" y1="481" x2="390" y2="481" stroke="#5b3a91" stroke-width="1.8" marker-end="url(#a1)"/>
+    <text x="365" y="470" text-anchor="middle" font-size="9" fill="#5b3a91">decoupled</text>
+
+    <rect x="390" y="424" width="300" height="115" rx="6" fill="#ffffff" stroke="#c9b8e8"/>
+    <text x="540" y="450" text-anchor="middle" font-size="12" font-weight="700" fill="#5b3a91">Agent Instance</text>
+    <text x="540" y="466" text-anchor="middle" font-size="10.5" fill="#666">(deployable runtime,</text>
+    <text x="540" y="480" text-anchor="middle" font-size="10.5" fill="#666">redeployed freely)</text>
+
+    <rect x="740" y="424" width="290" height="115" rx="6" fill="#ffffff" stroke="#c9b8e8"/>
+    <text x="885" y="450" text-anchor="middle" font-size="12" font-weight="700" fill="#5b3a91">Memory</text>
+    <text x="885" y="466" text-anchor="middle" font-size="10.5" fill="#666">tiered: ephemeral session</text>
+    <text x="885" y="480" text-anchor="middle" font-size="10.5" fill="#666">scratch vs. durable, shareable</text>
+
+    <rect x="1080" y="424" width="280" height="115" rx="6" fill="#ffffff" stroke="#c9b8e8"/>
+    <text x="1220" y="450" text-anchor="middle" font-size="12" font-weight="700" fill="#5b3a91">Tool Servers</text>
+    <text x="1220" y="466" text-anchor="middle" font-size="10.5" fill="#666">own resource type,</text>
+    <text x="1220" y="480" text-anchor="middle" font-size="10.5" fill="#666">not "a mode" of an agent</text>
+
+    <line x1="540" y1="557" x2="540" y2="590" stroke="#999" stroke-width="1.6" marker-end="url(#a2)"/>
+    <text x="600" y="578" font-size="10" fill="#888">agents call the gateway like any client</text>
+
+    <!-- ============ ZONE D: LLM GATEWAY PATH ============ -->
+    <text x="20" y="612" font-size="13" font-weight="700" fill="#444">LLM GATEWAY — LAYERED EDGE DEFENSE</text>
+
+    <rect x="40" y="625" width="120" height="55" rx="8" fill="#f5f5f5" stroke="#bbb"/>
+    <text x="100" y="657" text-anchor="middle" font-size="12" font-weight="600">Client</text>
+
+    <line x1="160" y1="652" x2="215" y2="652" stroke="#2c6e2f" stroke-width="2.2" marker-end="url(#a1)"/>
+
+    <rect x="215" y="625" width="180" height="55" rx="8" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="305" y="649" text-anchor="middle" font-size="11.5" font-weight="700" fill="#274b7a">WAF / Bot Mgmt</text>
+    <text x="305" y="665" text-anchor="middle" font-size="9.5" fill="#274b7a">(network layer)</text>
+
+    <line x1="395" y1="652" x2="450" y2="652" stroke="#2c6e2f" stroke-width="2.2" marker-end="url(#a1)"/>
+
+    <rect x="450" y="625" width="200" height="55" rx="8" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="550" y="649" text-anchor="middle" font-size="11.5" font-weight="700" fill="#7a4a1a">Payload Guardrails</text>
+    <text x="550" y="665" text-anchor="middle" font-size="9.5" fill="#7a4a1a">(PII, injection, cost limits)</text>
+
+    <line x1="650" y1="652" x2="705" y2="652" stroke="#2c6e2f" stroke-width="2.2" marker-end="url(#a1)"/>
+
+    <rect x="705" y="625" width="160" height="55" rx="8" fill="#f0fff0" stroke="#7bc47f"/>
+    <text x="785" y="657" text-anchor="middle" font-size="12" font-weight="700" fill="#2c6e2f">LLM Gateway</text>
+
+    <line x1="865" y1="652" x2="920" y2="652" stroke="#2c6e2f" stroke-width="2.2" marker-end="url(#a1)"/>
+
+    <rect x="920" y="625" width="130" height="55" rx="8" fill="#f5f0ff" stroke="#a98fd6"/>
+    <text x="985" y="657" text-anchor="middle" font-size="12" font-weight="700" fill="#5b3a91">Model</text>
+
+    <!-- budget layer connects into gateway -->
+    <line x1="1160" y1="241" x2="1160" y2="500" stroke="#e0a95f" stroke-width="1.4" stroke-dasharray="5,4"/>
+    <line x1="1160" y1="500" x2="785" y2="618" stroke="#e0a95f" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#a2)"/>
+    <text x="1030" y="560" font-size="9.5" fill="#a9772f">budget check at request time</text>
+
+    <!-- fork to collector -->
+    <line x1="785" y1="680" x2="785" y2="720" stroke="#888" stroke-width="1.6" marker-end="url(#a2)"/>
+    <text x="800" y="705" font-size="10" fill="#888">fork (non-blocking)</text>
+
+    <rect x="670" y="726" width="230" height="55" rx="8" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="785" y="750" text-anchor="middle" font-size="11.5" font-weight="700" fill="#274b7a">Trace Collector</text>
+    <text x="785" y="766" text-anchor="middle" font-size="9.5" fill="#274b7a">buffers &amp; retries independently</text>
+
+    <line x1="900" y1="753" x2="955" y2="753" stroke="#274b7a" stroke-width="2" marker-end="url(#a1)"/>
+
+    <rect x="955" y="726" width="240" height="55" rx="8" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="1075" y="750" text-anchor="middle" font-size="11.5" font-weight="700" fill="#7a4a1a">Governed Analytics Store</text>
+    <text x="1075" y="766" text-anchor="middle" font-size="9.5" fill="#7a4a1a">audit, cost, model behavior review</text>
+
+    <!-- bottom legend -->
+    <rect x="20" y="820" width="1360" height="170" rx="10" fill="#fbfbfb" stroke="#eee"/>
+    <text x="40" y="844" font-size="12.5" font-weight="700" fill="#444">READING THE PICTURE</text>
+    <text x="40" y="868" font-size="11" fill="#555">1. Environments (green) isolate blast radius — each holds its own control plane, model registry, and budget enforcement.</text>
+    <text x="40" y="888" font-size="11" fill="#555">2. Identity &amp; Secrets (red) underpins every environment and every agent — nothing authenticates with a long-lived static credential.</text>
+    <text x="40" y="908" font-size="11" fill="#555">3. Agent Runtime (purple) splits identity from instance so redeploys never destroy configuration or accumulated memory.</text>
+    <text x="40" y="928" font-size="11" fill="#555">4. The Gateway path (green/blue/orange) layers network-edge and payload-aware defense before any request reaches the model.</text>
+    <text x="40" y="948" font-size="11" fill="#555">5. The Observability fork (blue/orange, bottom) copies telemetry sideways — a slow or down analytics store never touches live traffic.</text>
+    <text x="40" y="972" font-size="10.5" fill="#999">This is one way to assemble these pieces, not the only one — see the capstone post for where we're still not sure we got the boundaries right.</text>
+  </svg>
+</div>
+</body>
+</html>

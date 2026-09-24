@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tool Server as Its Own Resource Type</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; background: #fafafa; color: #1a1a1a; margin: 0; padding: 32px; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .caption { color: #666; font-size: 13px; margin-bottom: 20px; }
+  svg { width: 100%; height: auto; background: #ffffff; border: 1px solid #e2e2e2; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tool Server as a First-Class, Shared Resource</h1>
+  <div class="caption">Right: multiple agents share one tool server resource with its own lifecycle and permissions. Left: the anti-pattern — a tool server hiding inside a single agent's config.</div>
+  <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow6" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444" />
+      </marker>
+    </defs>
+
+    <text x="200" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#b03a3a">ANTI-PATTERN</text>
+    <rect x="70" y="55" width="260" height="90" rx="10" fill="#faeeee" stroke="#b03a3a" stroke-width="2"/>
+    <text x="200" y="82" text-anchor="middle" font-size="12.5" font-weight="600">Agent "Policy Lookup"</text>
+    <text x="200" y="100" text-anchor="middle" font-size="11" fill="#555">owns tool logic internally</text>
+    <text x="200" y="116" text-anchor="middle" font-size="11" fill="#555">redeploy = breaks callers</text>
+    <text x="200" y="132" text-anchor="middle" font-size="10.5" fill="#8f2c2c">3 other agents quietly depend on it</text>
+
+    <line x1="130" y1="150" x2="130" y2="190" stroke="#b03a3a" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow6)"/>
+    <line x1="200" y1="150" x2="200" y2="190" stroke="#b03a3a" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow6)"/>
+    <line x1="270" y1="150" x2="270" y2="190" stroke="#b03a3a" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow6)"/>
+    <text x="200" y="205" text-anchor="middle" font-size="10" fill="#8f2c2c">hidden dependencies, invisible until it breaks</text>
+
+    <rect x="90" y="215" width="60" height="34" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="120" y="236" text-anchor="middle" font-size="10">Fraud</text>
+    <rect x="170" y="215" width="60" height="34" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="200" y="236" text-anchor="middle" font-size="10">CS Agent</text>
+    <rect x="250" y="215" width="60" height="34" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="280" y="236" text-anchor="middle" font-size="10">Renewals</text>
+
+    <line x1="450" y1="20" x2="450" y2="340" stroke="#ddd" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+    <text x="670" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#2e6b2e">FIRST-CLASS RESOURCE</text>
+
+    <rect x="540" y="220" width="60" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="570" y="244" text-anchor="middle" font-size="10">Claims</text>
+    <rect x="615" y="220" width="60" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="645" y="244" text-anchor="middle" font-size="10">Fraud</text>
+    <rect x="690" y="220" width="60" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="720" y="244" text-anchor="middle" font-size="10">CS Agent</text>
+    <rect x="765" y="220" width="60" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="795" y="244" text-anchor="middle" font-size="10">Renewals</text>
+
+    <line x1="570" y1="220" x2="655" y2="145" stroke="#3c8a3c" stroke-width="1.5" marker-end="url(#arrow6)"/>
+    <line x1="645" y1="220" x2="660" y2="145" stroke="#3c8a3c" stroke-width="1.5" marker-end="url(#arrow6)"/>
+    <line x1="720" y1="220" x2="670" y2="145" stroke="#3c8a3c" stroke-width="1.5" marker-end="url(#arrow6)"/>
+    <line x1="795" y1="220" x2="685" y2="145" stroke="#3c8a3c" stroke-width="1.5" marker-end="url(#arrow6)"/>
+
+    <rect x="560" y="60" width="220" height="85" rx="10" fill="#dff0df" stroke="#3c8a3c" stroke-width="2"/>
+    <text x="670" y="88" text-anchor="middle" font-size="12.5" font-weight="600">Tool Server: Policy Lookup</text>
+    <text x="670" y="106" text-anchor="middle" font-size="10.5" fill="#2e6b2e">own lifecycle, own permissions</text>
+    <text x="670" y="122" text-anchor="middle" font-size="10.5" fill="#2e6b2e">caller-scoped capability grants</text>
+    <text x="670" y="136" text-anchor="middle" font-size="10" fill="#2e6b2e">dependents visible in resource graph</text>
+  </svg>
+</div>
+</body>
+</html>

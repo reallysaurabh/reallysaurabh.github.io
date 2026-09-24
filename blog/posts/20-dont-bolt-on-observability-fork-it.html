@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Don&#39;t Bolt Observability Onto the Request Path — Fork It — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="Your analytics pipeline having a bad day should be its own problem, not everyone&#39;s">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-4);">
+          <p class="post-eyebrow">Operating It at Scale · Post 20 of 21</p>
+          <h1>Don&#39;t Bolt Observability Onto the Request Path — Fork It</h1>
+          <p class="post-subtitle">Your analytics pipeline having a bad day should be its own problem, not everyone&#39;s</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>8 min read</span>
+            <span>1,154 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>Somewhere in most platforms&#39; history, someone asks a perfectly reasonable question — &quot;can we get usage and cost data into the analytics warehouse?&quot; — and someone else, also being perfectly reasonable, adds a call to the warehouse right there in the request-handling code. Eighteen months later, the warehouse has a slow day, and suddenly every live LLM request is timing out because of a system that has nothing to do with serving the request. This is not a hypothetical anyone in platform engineering needs help imagining.</p>
+<h2 id="the-instinct-and-why-it39s-understandable">The instinct, and why it&#39;s understandable</h2>
+<p>Piping usage and trace telemetry — prompts, completions, token counts, latencies, costs — into a governed analytics store is genuinely valuable. Compliance teams want it for audit. Finance wants it for cost attribution. ML teams want it for model-behavior review. The instinct to add &quot;send this to the warehouse&quot; as one more step in the request-handling path is completely understandable, because it&#39;s the path that already has all the data sitting right there in memory.</p>
+<p>It&#39;s also, in our experience, the wrong place to put it — not because the goal is wrong, but because of what it couples together.</p>
+<h2 id="the-coupling-problem">The coupling problem</h2>
+<p>Once the analytics write is inline in the request path, your live LLM traffic inherits the availability and latency characteristics of your analytics store, whether anyone intended that or not. A few ways this goes wrong, none of them exotic:</p>
+<ul>
+<li><strong>The warehouse has a slow write day</strong> (indexing, backfill, a downstream job hogging resources) and now every LLM request pays that latency tax, even though nobody using the actual product cares about analytics freshness in the moment.</li>
+<li><strong>The warehouse has an outage.</strong> If the write is synchronous and unguarded, requests start failing not because the model is unavailable, but because a completely unrelated compliance pipeline is down. Explaining that incident to leadership is a special kind of unpleasant.</li>
+<li><strong>The schema changes</strong>, or the write path picks up a new required field, and a deploy to the analytics side now has blast radius on live traffic that nobody modeling &quot;what could this deploy break&quot; would have guessed.</li>
+</ul>
+<p>The pattern underneath all three: <strong>a system that exists to relay requests to a model has acquired a second job — being reliable infrastructure for a downstream analytics pipeline — and nobody explicitly decided that trade-off.</strong> It just accumulated.</p>
+<h2 id="what-we39ve-done-instead-fork-the-stream-at-a-dedicated-collector">What we&#39;ve done instead: fork the stream at a dedicated collector</h2>
+<p>The alternative we&#39;ve settled into — and we&#39;ll say up front, it took us a couple of iterations to get here, this wasn&#39;t the first thing we tried — is to fork the trace stream at a dedicated collector sitting outside the request-response cycle, rather than writing to the analytics store from inside it. The gateway emits its trace data once, to the fork point; the fork point is responsible for getting it to the governed analytics store, buffering, retrying, and degrading independently of whether a live request is in flight.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+      </marker>
+      <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+      </marker>
+    </defs>
+
+    <!-- Main path: Client -> Gateway -> Model -->
+    <rect x="40" y="60" width="110" height="55" rx="8" fill="#f5f5f5" stroke="#bbb"/>
+    <text x="95" y="92" text-anchor="middle" font-size="13" font-weight="600">Client</text>
+
+    <line x1="150" y1="87" x2="220" y2="87" stroke="#2c6e2f" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+    <rect x="220" y="60" width="150" height="55" rx="8" fill="#f0fff0" stroke="#7bc47f"/>
+    <text x="295" y="92" text-anchor="middle" font-size="13" font-weight="600" fill="#2c6e2f">LLM Gateway</text>
+
+    <line x1="370" y1="87" x2="440" y2="87" stroke="#2c6e2f" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+    <rect x="440" y="60" width="110" height="55" rx="8" fill="#f5f0ff" stroke="#a98fd6"/>
+    <text x="495" y="92" text-anchor="middle" font-size="13" font-weight="600" fill="#5b3a91">Model</text>
+
+    <line x1="440" y1="105" x2="380" y2="105" stroke="#2c6e2f" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow3)"/>
+    <text x="410" y="130" text-anchor="middle" font-size="10.5" fill="#2c6e2f" font-weight="600">main path: fast, unaffected by analytics</text>
+
+    <!-- Fork point -->
+    <line x1="295" y1="115" x2="295" y2="200" stroke="#888" stroke-width="1.6" stroke-dasharray="4,3"/>
+    <circle cx="295" cy="115" r="4" fill="#888"/>
+    <text x="310" y="150" font-size="10.5" fill="#888">fork (fire-and-forget,</text>
+    <text x="310" y="164" font-size="10.5" fill="#888">non-blocking)</text>
+
+    <line x1="295" y1="200" x2="295" y2="235" stroke="#888" stroke-width="1.6" marker-end="url(#arrow3)"/>
+
+    <!-- Collector -->
+    <rect x="190" y="240" width="210" height="60" rx="8" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="295" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#274b7a">Trace Collector</text>
+    <text x="295" y="284" text-anchor="middle" font-size="10.5" fill="#274b7a">buffers, retries, degrades alone</text>
+
+    <line x1="400" y1="270" x2="470" y2="270" stroke="#274b7a" stroke-width="2" marker-end="url(#arrow3)"/>
+
+    <!-- Analytics store -->
+    <rect x="470" y="240" width="220" height="60" rx="8" fill="#fff4e8" stroke="#e0a95f"/>
+    <text x="580" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#7a4a1a">Governed Analytics Store</text>
+    <text x="580" y="284" text-anchor="middle" font-size="10.5" fill="#c0392b">can be slow / down without harm</text>
+
+    <!-- warning bolt if store is down -->
+    <text x="740" y="270" font-size="22" fill="#c0392b">⚠</text>
+    <text x="765" y="266" font-size="10.5" fill="#c0392b">outage here</text>
+    <text x="765" y="280" font-size="10.5" fill="#c0392b">stays here</text>
+
+    <text x="40" y="340" font-size="11" fill="#888">Green = live request/response path · Blue/orange = forked telemetry path, decoupled from request latency</text>
+  </svg></div><figcaption>it shows the client-to-model request path running independently of a trace collector that forks off the traffic and feeds a governed analytics store, so slowness or an outage downstream never touches the live path.</figcaption><a class="diagram-standalone-link" href="../diagrams/20-trace-collector-fork.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<p>The property this buys you, stated plainly: <strong>the analytics store can be on fire, and nobody serving a live request needs to know or care.</strong> The collector can buffer, drop with a logged warning, retry on its own schedule, or fall over entirely — and the worst outcome is a gap in yesterday&#39;s usage dashboard, not a page at 2 a.m. for an outage that was never really about serving requests in the first place.</p>
+<h2 id="a-small-hypothetical-example">A small, hypothetical example</h2>
+<p>Picture a platform that added inline analytics writes early on, when traffic was low and nobody had felt the pain yet. Eighteen months and ten times the traffic later, a routine index rebuild on the analytics warehouse slows every write by 400ms. Every LLM request — regardless of anything to do with the model itself — now takes 400ms longer, and the on-call engineer spends the first hour of the incident looking at the model provider&#39;s status page, because that&#39;s the obvious suspect. It takes a while to even <em>consider</em> that the slowdown has nothing to do with the model at all. That hour is the tax you pay for coupling two systems that never needed to be coupled.</p>
+<h2 id="why-this-isn39t-free-and-where-we39re-genuinely-unsure">Why this isn&#39;t free, and where we&#39;re genuinely unsure</h2>
+<p>We don&#39;t want to oversell this — forking the stream introduces its own honest trade-offs:</p>
+<ul>
+<li><strong>You&#39;ve added a component.</strong> The collector is one more thing to run, monitor, and keep healthy, and &quot;one more thing to run&quot; is never actually free, even when the alternative is worse.</li>
+<li><strong>You&#39;ve introduced eventual consistency for analytics data.</strong> If the collector buffers or briefly falls behind, the warehouse is now slightly stale relative to what&#39;s happening live. For most of the use cases we listed — audit, cost attribution, behavior review — that&#39;s a completely acceptable trade. If someone needs real-time trace visibility for an active incident, this isn&#39;t the tool for that, and we&#39;d reach for something else (live log tailing, request-scoped tracing) for that specific need.</li>
+<li><strong>The failure mode has moved, not disappeared.</strong> If the collector itself gets overwhelmed, you need it to degrade gracefully — drop and log, rather than back-pressure onto the gateway — or you&#39;ve just rebuilt the coupling problem one hop downstream. We think we&#39;ve gotten this right, but we haven&#39;t yet had the traffic spike that would really prove it.</li>
+</ul>
+<h2 id="pitfalls">Pitfalls</h2>
+<ul>
+<li><strong>Building the fork, then accidentally making the gateway wait for the collector to acknowledge.</strong> This defeats the entire point — if the gateway blocks on the collector&#39;s response, you&#39;ve reintroduced the coupling with extra steps.</li>
+<li><strong>Assuming &quot;async&quot; automatically means &quot;safe.&quot;</strong> An unbounded in-memory queue in front of a slow collector is just a slower-motion version of the same failure — it needs backpressure or a bounded buffer with an explicit drop policy.</li>
+<li><strong>Forgetting that the collector itself needs monitoring.</strong> It&#39;s now a real piece of infrastructure, not a fire-and-forget log statement, and it deserves the same operational attention as anything else load-bearing.</li>
+<li><strong>Skipping this because &quot;we&#39;re too small to need it yet.&quot;</strong> Maybe — but the fork is meaningfully cheaper to build before there&#39;s an established inline pattern to migrate away from. We added ours later than we&#39;d have liked.</li>
+</ul>
+<p>If you&#39;ve solved the &quot;observability without coupling&quot; problem a different way — a service mesh sidecar, a message queue, something else — we&#39;d be glad to hear how it&#39;s holding up under real load, because we suspect the fork-at-a-collector pattern isn&#39;t the only reasonable shape this can take.</p>
+<p>Next up, the capstone: <strong>&quot;What We&#39;d Do Differently: Patterns That Held Up and Ones That Didn&#39;t.&quot;</strong></p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #PlatformEngineering #Observability #DataEngineering #LLMOps #SystemDesign</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#PlatformEngineering</span><span class="pill">#Observability</span><span class="pill">#DataEngineering</span><span class="pill">#LLMOps</span><span class="pill">#SystemDesign</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="19-component-prefixed-versioning.html"><span class="pager-direction">← Previous</span><span class="pager-title">Component-Prefixed Versioning for a Multi-Binary Platform</span></a>
+    <a class="pager-link next" href="21-capstone-what-wed-do-differently.html"><span class="pager-direction">Next →</span><span class="pager-title">What We&#39;d Do Differently: Patterns That Held Up and Ones That Didn&#39;t</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#the-instinct-and-why-it39s-understandable">The instinct, and why it&amp;#39;s understandable</a></li>
+      <li><a href="#the-coupling-problem">The coupling problem</a></li>
+      <li><a href="#what-we39ve-done-instead-fork-the-stream-at-a-dedicated-collector">What we&amp;#39;ve done instead: fork the stream at a dedicated collector</a></li>
+      <li><a href="#a-small-hypothetical-example">A small, hypothetical example</a></li>
+      <li><a href="#why-this-isn39t-free-and-where-we39re-genuinely-unsure">Why this isn&amp;#39;t free, and where we&amp;#39;re genuinely unsure</a></li>
+      <li><a href="#pitfalls">Pitfalls</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

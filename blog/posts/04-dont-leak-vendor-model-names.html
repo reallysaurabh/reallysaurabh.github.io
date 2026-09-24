@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Don&#39;t Let Vendor Model Names Leak Into Your API — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="Somewhere, a model provider is about to rename a string you&#39;ve been treating as a permanent identifier. This is your warning.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-1);">
+          <p class="post-eyebrow">Platform Foundations · Post 4 of 21</p>
+          <h1>Don&#39;t Let Vendor Model Names Leak Into Your API</h1>
+          <p class="post-subtitle">Somewhere, a model provider is about to rename a string you&#39;ve been treating as a permanent identifier. This is your warning.</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>7 min read</span>
+            <span>820 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>Every model provider&#39;s naming scheme is, from the outside, someone else&#39;s internal decision that you don&#39;t get a vote on. That&#39;s fine, right up until you&#39;ve built your API contract on top of it.</p>
+<p>This is a short one, because the idea is simple even though the consequences of skipping it aren&#39;t: whatever identifier your platform&#39;s consumers use to reference &quot;the model I want to call,&quot; it should be <em>yours</em> — a resource ID you mint and control — not the literal string the vendor happens to be calling that model this quarter.</p>
+<h2 id="the-coupling-trap">The coupling trap</h2>
+<p>Here&#39;s how it happens, innocently enough. Your platform needs to let a team register &quot;we want to use provider X&#39;s flagship model.&quot; The fastest way to do that is to store the vendor&#39;s own model string — something like a specific deployment name — as the identifier, and let every consumer reference the model by that same string. It works. It ships fast. Everyone moves on.</p>
+<p>Then one of a few entirely predictable things happens:</p>
+<ul>
+<li>The vendor renames or restructures the string — a new version suffix, a deprecated naming convention, a model that used to be one SKU and is now split into regional variants.</li>
+<li>You want to run the same logical model across two regions, or even two providers, for redundancy or cost reasons — and now &quot;the model&quot; needs to mean more than one underlying vendor string simultaneously.</li>
+<li>The vendor deprecates the exact string you exposed, on their timeline, not yours, and now every consumer of your API — who thinks they&#39;re calling a stable identifier you own — breaks in lockstep, on a schedule you didn&#39;t choose.</li>
+</ul>
+<p>None of these are exotic edge cases. They&#39;re closer to &quot;things that will definitely happen if you run this platform long enough.&quot; The question isn&#39;t whether a vendor will eventually reshuffle their naming — it&#39;s whether your API contract felt that reshuffle or was insulated from it.</p>
+<h2 id="a-small-hypothetical-example">A small, hypothetical example</h2>
+<p>Imagine a scaling healthtech company registers a model under the vendor&#39;s own identifier — something like <code>provider-model-v2-preview</code> — because that&#39;s what showed up in the vendor&#39;s docs and it was the path of least resistance. A dozen internal services start calling it by that exact string.</p>
+<p>Eight months later, the vendor promotes the preview to general availability and renames it. The old preview string still technically works for a grace period, then stops. Every one of those dozen services now needs a coordinated update, on a deadline set by someone else&#39;s release calendar, discovered mostly through failed requests rather than a heads-up. Compare that to: the platform had assigned its own resource ID, say <code>healthtech-summarizer-v1</code>, and one row in the model registry gets repointed to the new vendor string behind the scenes. Nothing downstream even notices.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 880 360" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444" />
+      </marker>
+    </defs>
+
+    <!-- Coupled (left) -->
+    <text x="200" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#b03a3a">COUPLED</text>
+    <rect x="60" y="50" width="120" height="40" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="120" y="74" text-anchor="middle" font-size="11">Service A</text>
+    <rect x="200" y="50" width="120" height="40" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="260" y="74" text-anchor="middle" font-size="11">Service B</text>
+    <rect x="130" y="120" width="140" height="40" rx="6" fill="#f6dcdc" stroke="#b03a3a"/>
+    <text x="200" y="144" text-anchor="middle" font-size="11">Service C</text>
+
+    <line x1="120" y1="90" x2="185" y2="205" stroke="#b03a3a" stroke-width="1.8" marker-end="url(#arrow3)"/>
+    <line x1="260" y1="90" x2="205" y2="205" stroke="#b03a3a" stroke-width="1.8" marker-end="url(#arrow3)"/>
+    <line x1="200" y1="160" x2="200" y2="205" stroke="#b03a3a" stroke-width="1.8" marker-end="url(#arrow3)"/>
+
+    <rect x="90" y="210" width="220" height="55" rx="8" fill="#8f2c2c"/>
+    <text x="200" y="233" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">"provider-model-v2-preview"</text>
+    <text x="200" y="250" text-anchor="middle" fill="#fdd" font-size="10.5">vendor's raw string, held by all</text>
+
+    <text x="200" y="300" text-anchor="middle" font-size="12" fill="#8f2c2c">Vendor renames it → everything breaks at once</text>
+
+    <!-- divider -->
+    <line x1="440" y1="20" x2="440" y2="340" stroke="#ddd" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+    <!-- Decoupled (right) -->
+    <text x="680" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#2e6b2e">DECOUPLED</text>
+    <rect x="540" y="50" width="120" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="600" y="74" text-anchor="middle" font-size="11">Service A</text>
+    <rect x="680" y="50" width="120" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="740" y="74" text-anchor="middle" font-size="11">Service B</text>
+    <rect x="610" y="120" width="140" height="40" rx="6" fill="#dff0df" stroke="#3c8a3c"/>
+    <text x="680" y="144" text-anchor="middle" font-size="11">Service C</text>
+
+    <line x1="600" y1="90" x2="665" y2="205" stroke="#3c8a3c" stroke-width="1.8" marker-end="url(#arrow3)"/>
+    <line x1="740" y1="90" x2="685" y2="205" stroke="#3c8a3c" stroke-width="1.8" marker-end="url(#arrow3)"/>
+    <line x1="680" y1="160" x2="680" y2="205" stroke="#3c8a3c" stroke-width="1.8" marker-end="url(#arrow3)"/>
+
+    <rect x="570" y="210" width="220" height="55" rx="8" fill="#2e6b2e"/>
+    <text x="680" y="233" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">"summarizer-v1" (your ID)</text>
+    <text x="680" y="250" text-anchor="middle" fill="#dfd" font-size="10.5">registry maps this to vendor string</text>
+
+    <text x="680" y="300" text-anchor="middle" font-size="12" fill="#2e6b2e">Vendor renames it → one row updates, nobody notices</text>
+  </svg></div><figcaption>It&#39;s a simple before/after — the &quot;coupled&quot; shape where every consumer holds the vendor&#39;s raw string directly, versus the &quot;decoupled&quot; shape where consumers hold your resource ID and only the registry itself knows the vendor&#39;s current string.</figcaption><a class="diagram-standalone-link" href="../diagrams/04-resource-id-vs-vendor-name.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<h2 id="what-this-buys-you-concretely">What this buys you, concretely</h2>
+<ul>
+<li><strong>Multi-region and multi-vendor become non-events.</strong> Your resource ID can point at different underlying vendor deployments in different regions, or even fail over between vendors, without anyone downstream needing to know or care.</li>
+<li><strong>Vendor deprecations become a registry update, not an incident.</strong> You repoint one row; consumers keep calling the same identifier they always have.</li>
+<li><strong>Your API surface actually belongs to you.</strong> You can document, version, and evolve a resource ID on your own terms. You can&#39;t do any of that for a string someone else&#39;s product team owns.</li>
+</ul>
+<h2 id="the-one-place-we39ve-gone-back-and-forth">The one place we&#39;ve gone back and forth</h2>
+<p>Where we&#39;re genuinely less certain: how much of the vendor&#39;s own versioning semantics to surface <em>through</em> your resource ID versus hide entirely. Fully hiding it is the purest version of the pattern, but it means a consumer can&#39;t tell &quot;am I on the newest capable model&quot; without asking your registry a separate question. We&#39;ve landed on exposing a coarse version marker on our own resource ID (a <code>v1</code>, <code>v2</code> on <em>our</em> identifier, bumped when we choose to, not when the vendor does) rather than the vendor&#39;s raw version string — but we wouldn&#39;t call this settled, and if you&#39;ve found a cleaner way to give consumers visibility without recoupling them to the vendor&#39;s naming, that&#39;s a trade-off worth comparing notes on.</p>
+<p>This is a small pattern with an outsized payoff, and it&#39;s one of the cheapest things to get right early — which is exactly why <a href="21-capstone-what-wed-do-differently.html">the capstone</a> later in this series flags it as a &quot;do this on day one&quot; item.</p>
+<p>Next: <a href="05-multi-cloud-iac-foundation-vs-per-resource.html">post 5</a>, on a related decoupling problem one layer down — separating the infrastructure that&#39;s shared and long-lived from the infrastructure that&#39;s provisioned and torn down per resource.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIPlatform #APIDesign #SoftwareArchitecture #PlatformEngineering #MLOps #MultiCloud #TechDebt #AIInfrastructure</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIPlatform</span><span class="pill">#APIDesign</span><span class="pill">#SoftwareArchitecture</span><span class="pill">#PlatformEngineering</span><span class="pill">#MLOps</span><span class="pill">#MultiCloud</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="03-environments-not-just-endpoints.html"><span class="pager-direction">← Previous</span><span class="pager-title">Why Your AI Platform Needs Environments, Not Just Endpoints</span></a>
+    <a class="pager-link next" href="05-multi-cloud-iac-foundation-vs-per-resource.html"><span class="pager-direction">Next →</span><span class="pager-title">Multi-Cloud Infrastructure as Code: Foundation vs. Per-Resource Provisioning</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#the-coupling-trap">The coupling trap</a></li>
+      <li><a href="#a-small-hypothetical-example">A small, hypothetical example</a></li>
+      <li><a href="#what-this-buys-you-concretely">What this buys you, concretely</a></li>
+      <li><a href="#the-one-place-we39ve-gone-back-and-forth">The one place we&amp;#39;ve gone back and forth</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

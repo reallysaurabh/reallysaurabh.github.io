@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Input vs Output Contract</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #fafafa; margin: 0; padding: 32px; color: #1a1a1a; }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p.caption { font-size: 13px; color: #666; margin: 12px 0 0; text-align: center; }
+  svg { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Spec (Input) vs. Status/Outputs (Computed) on One Resource</h1>
+  <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#999"/>
+      </marker>
+    </defs>
+
+    <rect x="20" y="60" width="300" height="240" rx="10" fill="#eef4ff" stroke="#3b6fd6" stroke-width="1.5"/>
+    <text x="170" y="90" font-size="14" font-weight="700" text-anchor="middle" fill="#3b6fd6">SPEC (input)</text>
+    <text x="45" y="120" font-size="12" fill="#333">image: "my-model:v2"</text>
+    <text x="45" y="145" font-size="12" fill="#333">region: "eu-west-1"</text>
+    <text x="45" y="170" font-size="12" fill="#333">replicas: 3</text>
+    <text x="45" y="195" font-size="12" fill="#333">envName: "staging"</text>
+    <text x="45" y="230" font-size="11.5" fill="#3b6fd6" font-style="italic">caller-supplied — never</text>
+    <text x="45" y="248" font-size="11.5" fill="#3b6fd6" font-style="italic">duplicated into outputs</text>
+
+    <rect x="400" y="60" width="300" height="240" rx="10" fill="#fff3ec" stroke="#d6603b" stroke-width="1.5"/>
+    <text x="550" y="90" font-size="14" font-weight="700" text-anchor="middle" fill="#d6603b">STATUS / OUTPUTS (computed)</text>
+    <text x="425" y="120" font-size="12" fill="#333">imageDigest: "sha256:9fa2..."</text>
+    <text x="425" y="145" font-size="12" fill="#333">assignedId: "res-88213"</text>
+    <text x="425" y="170" font-size="12" fill="#333">endpointUrl: "https://..."</text>
+    <text x="425" y="195" font-size="12" fill="#333">provisionedAt: "2026-..."</text>
+    <text x="425" y="230" font-size="11.5" fill="#d6603b" font-style="italic">system-computed only —</text>
+    <text x="425" y="248" font-size="11.5" fill="#d6603b" font-style="italic">nothing the caller could supply</text>
+
+    <line x1="320" y1="180" x2="400" y2="180" stroke="#999" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow4)"/>
+    <text x="360" y="168" font-size="10" text-anchor="middle" fill="#999">✕ no copy</text>
+  </svg>
+  <p class="caption">If a value already lives in the spec, it doesn't get a second, driftable home in outputs — consumers read the spec for it instead.</p>
+</div>
+</body>
+</html>

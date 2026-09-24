@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Make-Before-Break Credential Rotation</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 18px; color: #1a1a2e; text-align: center; margin: 0 0 4px; }
+  p.caption { text-align: center; color: #6b7280; font-size: 13px; margin: 0 0 16px; }
+  svg { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Make-Before-Break Credential Rotation</h1>
+  <p class="caption">Two valid credentials overlap briefly so the agent never has zero.</p>
+  <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#374151"/>
+      </marker>
+    </defs>
+
+    <!-- timeline axis -->
+    <line x1="60" y1="250" x2="840" y2="250" stroke="#d1d5db" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="820" y="270" font-size="11" fill="#9ca3af">time</text>
+
+    <!-- Credential A bar -->
+    <rect x="80" y="70" width="420" height="34" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+    <text x="290" y="92" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="600">Credential A — valid</text>
+
+    <!-- Credential B bar, overlapping -->
+    <rect x="380" y="120" width="420" height="34" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="2"/>
+    <text x="590" y="142" text-anchor="middle" font-size="13" fill="#065f46" font-weight="600">Credential B — issued &amp; validated</text>
+
+    <!-- overlap highlight -->
+    <rect x="380" y="60" width="120" height="104" fill="#fde68a" opacity="0.35"/>
+    <text x="440" y="185" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">both valid — zero downtime window</text>
+
+    <!-- revoke marker -->
+    <line x1="500" y1="60" x2="500" y2="165" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+    <text x="500" y="45" text-anchor="middle" font-size="11" fill="#ef4444">A revoked here</text>
+
+    <!-- labels under axis -->
+    <text x="80" y="270" font-size="11" fill="#6b7280">agent using A</text>
+    <text x="500" y="270" font-size="11" fill="#6b7280" text-anchor="middle">overlap window</text>
+    <text x="720" y="270" font-size="11" fill="#6b7280">agent using B only</text>
+  </svg>
+</div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="Notes on the architectural decisions behind an internal AI platform for a modern, cloud-native org — written up as generalized patterns, not a case study of one company. Some of this held up under real scale. Some of it we&#39;d do differently. We&#39;re sharing both.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-index">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      
+      <a class="back-link" href="../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<section class="hero">
+  <div class="container">
+    <p class="hero-kicker">A field series</p>
+    <h1>Building an Enterprise AI Platform That Scales</h1>
+    <p>Notes on the architectural decisions behind an internal AI platform for a modern, cloud-native org — written up as generalized patterns, not a case study of one company. Some of this held up under real scale. Some of it we&#39;d do differently. We&#39;re sharing both.</p>
+    <div class="hero-meta">
+      <span><strong>21</strong> posts</span>
+      <span><strong>108</strong> min total read</span>
+      <span><strong>19</strong> diagrams</span>
+    </div>
+    <nav class="part-nav" aria-label="Jump to part">
+      <a href="#part-0">The Case, and the Fork</a>
+<a href="#part-1">Platform Foundations</a>
+<a href="#part-2">Governance: Cost, Concurrency, Risk</a>
+<a href="#part-3">Agent Runtime Architecture</a>
+<a href="#part-4">Operating It at Scale</a>
+<a href="#capstone">Capstone</a>
+    </nav>
+  </div>
+</section>
+<section class="part-section" id="part-0">
+  <div class="container">
+    <div class="part-heading">
+      <span class="part-dot" style="background: var(--part-0);"></span>
+      <h2>The Case, and the Fork</h2>
+      <span class="part-count">2 posts</span>
+    </div>
+    <div class="card-grid">
+      <article class="card" style="--part-hue: var(--part-0);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 1 of 21</span>
+    <h3><a href="posts/01-why-you-need-an-ai-platform.html">Why You Need an AI Platform, Not Just AI Tools</a></h3>
+    <p class="card-sub">The shadow IT of the 2010s is back, wearing a nicer jacket and calling itself &#39;innovation.&#39;</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-0);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 2 of 21</span>
+    <h3><a href="posts/02-identity-ecosystem-fork-google-vs-azure.html">Google Workspace vs. Microsoft 365/Azure: How Your Identity Ecosystem Forks Your AI Platform</a></h3>
+    <p class="card-sub">You don&#39;t pick your cloud identity provider. It picks you, sometime around when someone signed a contract you weren&#39;t in the room for.</p>
+    <div class="card-footer">
+      <span>10 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+<section class="part-section" id="part-1">
+  <div class="container">
+    <div class="part-heading">
+      <span class="part-dot" style="background: var(--part-1);"></span>
+      <h2>Platform Foundations</h2>
+      <span class="part-count">4 posts</span>
+    </div>
+    <div class="card-grid">
+      <article class="card" style="--part-hue: var(--part-1);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 3 of 21</span>
+    <h3><a href="posts/03-environments-not-just-endpoints.html">Why Your AI Platform Needs Environments, Not Just Endpoints</a></h3>
+    <p class="card-sub">&#39;/prod&#39; and &#39;/not-prod&#39; is not an environment strategy. It&#39;s a coin flip with a leading slash.</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIPlatform</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-1);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 4 of 21</span>
+    <h3><a href="posts/04-dont-leak-vendor-model-names.html">Don&#39;t Let Vendor Model Names Leak Into Your API</a></h3>
+    <p class="card-sub">Somewhere, a model provider is about to rename a string you&#39;ve been treating as a permanent identifier. This is your warning.</p>
+    <div class="card-footer">
+      <span>7 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIPlatform</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-1);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 5 of 21</span>
+    <h3><a href="posts/05-multi-cloud-iac-foundation-vs-per-resource.html">Multi-Cloud Infrastructure as Code: Foundation vs. Per-Resource Provisioning</a></h3>
+    <p class="card-sub">Someone deletes a &#39;resource.&#39; The shared networking everyone depends on goes with it. Nobody meant for this to happen. It happened anyway.</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIPlatform</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-1);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 6 of 21</span>
+    <h3><a href="posts/06-secretless-provisioning-federated-identity.html">Secretless Provisioning: Federated Identity for Infrastructure-as-Code</a></h3>
+    <p class="card-sub">The most secure cloud credential is the one that expires before anyone thinks to steal it.</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIPlatform</span></span>
+    </div>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+<section class="part-section" id="part-2">
+  <div class="container">
+    <div class="part-heading">
+      <span class="part-dot" style="background: var(--part-2);"></span>
+      <h2>Governance: Cost, Concurrency, Risk</h2>
+      <span class="part-count">5 posts</span>
+    </div>
+    <div class="card-grid">
+      <article class="card" style="--part-hue: var(--part-2);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 7 of 21</span>
+    <h3><a href="posts/07-two-layer-budget-problem.html">The Two-Layer Budget Problem: Soft Allocation vs. Hard Caps</a></h3>
+    <p class="card-sub">Why your spend-tracking layer and your billing provider&#39;s cap are not the same system, and never should be</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-2);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 8 of 21</span>
+    <h3><a href="posts/08-self-service-limits-need-audit-trail.html">Self-Service Limits Need an Audit Trail, Not an Email Thread</a></h3>
+    <p class="card-sub">The moment budget approval becomes a forwardable link, you&#39;ve lost the audit trail you thought you had</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-2);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 9 of 21</span>
+    <h3><a href="posts/09-workflow-engine-execution-id-as-lock.html">Using Your Workflow Engine&#39;s Execution ID as a Concurrency Lock</a></h3>
+    <p class="card-sub">A trick that feels like it&#39;s cheating physics, and a couple of ways it will happily cheat you back</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-2);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 10 of 21</span>
+    <h3><a href="posts/10-computed-outputs-need-typed-contract.html">Computed Outputs Deserve Their Own Typed Contract</a></h3>
+    <p class="card-sub">A small modeling decision that either keeps your data honest or quietly lets it drift</p>
+    <div class="card-footer">
+      <span>7 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-2);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 11 of 21</span>
+    <h3><a href="posts/11-security-trade-off-ledger.html">The Security Trade-Off Ledger: Documenting Accepted Risk on Purpose</a></h3>
+    <p class="card-sub">You already have a list of security compromises you&#39;ve made. The question is whether it&#39;s written down anywhere.</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+<section class="part-section" id="part-3">
+  <div class="container">
+    <div class="part-heading">
+      <span class="part-dot" style="background: var(--part-3);"></span>
+      <h2>Agent Runtime Architecture</h2>
+      <span class="part-count">6 posts</span>
+    </div>
+    <div class="card-grid">
+      <article class="card" style="--part-hue: var(--part-3);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 12 of 21</span>
+    <h3><a href="posts/12-identity-vs-instance-agent-config.html">Identity vs. Instance: Why Your Agent&#39;s Config Shouldn&#39;t Live Inside Its Deployment</a></h3>
+    <p class="card-sub">Redeploying an agent shouldn&#39;t mean reintroducing yourself to everyone it knows</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-3);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 13 of 21</span>
+    <h3><a href="posts/13-machine-identity-for-agents.html">Machine Identity for Autonomous Agents: No Human, No Shared Secret</a></h3>
+    <p class="card-sub">Nobody&#39;s watching Slack for &#39;my API key expired&#39; from a robot at 3am</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-3);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 14 of 21</span>
+    <h3><a href="posts/14-on-behalf-of-agent-acting-as-user.html">On-Behalf-Of: Letting an Agent Act as the User, Not as the Platform</a></h3>
+    <p class="card-sub">One almighty service account is not an identity model, it&#39;s a liability with an API</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-3);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 15 of 21</span>
+    <h3><a href="posts/15-memory-is-a-resource.html">Memory Is a Resource, Not an Attribute</a></h3>
+    <p class="card-sub">memory_enabled=true, persistent=false — congratulations, you&#39;ve invented a Schrödinger&#39;s agent</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-3);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 16 of 21</span>
+    <h3><a href="posts/16-config-without-redeploy.html">Config That Changes Without a Redeploy: Env Vars and Protocol as Runtime Concerns</a></h3>
+    <p class="card-sub">If changing a timeout requires a release train, you didn&#39;t build infrastructure, you built a very slow form</p>
+    <div class="card-footer">
+      <span>7 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-3);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 17 of 21</span>
+    <h3><a href="posts/17-tool-servers-deserve-own-resource-type.html">Tool Servers Deserve Their Own Resource Type</a></h3>
+    <p class="card-sub">It&#39;s not an agent that happens to expose tools. It&#39;s infrastructure wearing a disguise.</p>
+    <div class="card-footer">
+      <span>7 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+<section class="part-section" id="part-4">
+  <div class="container">
+    <div class="part-heading">
+      <span class="part-dot" style="background: var(--part-4);"></span>
+      <h2>Operating It at Scale</h2>
+      <span class="part-count">3 posts</span>
+    </div>
+    <div class="card-grid">
+      <article class="card" style="--part-hue: var(--part-4);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 18 of 21</span>
+    <h3><a href="posts/18-threat-model-at-the-edge-of-llm-gateway.html">The Threat Model at the Edge of an LLM Gateway</a></h3>
+    <p class="card-sub">Your WAF has never read a system prompt, and that&#39;s the problem</p>
+    <div class="card-footer">
+      <span>9 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-4);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 19 of 21</span>
+    <h3><a href="posts/19-component-prefixed-versioning.html">Component-Prefixed Versioning for a Multi-Binary Platform</a></h3>
+    <p class="card-sub">What&#39;s actually running in production shouldn&#39;t require an archaeology degree</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+<article class="card" style="--part-hue: var(--part-4);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 20 of 21</span>
+    <h3><a href="posts/20-dont-bolt-on-observability-fork-it.html">Don&#39;t Bolt Observability Onto the Request Path — Fork It</a></h3>
+    <p class="card-sub">Your analytics pipeline having a bad day should be its own problem, not everyone&#39;s</p>
+    <div class="card-footer">
+      <span>8 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+<section class="part-section" id="capstone">
+  <div class="container">
+    <div class="part-heading">
+      <span class="part-dot" style="background: var(--part-5);"></span>
+      <h2>Capstone</h2>
+      <span class="part-count">1 post</span>
+    </div>
+    <div class="card-grid">
+      <article class="card" style="--part-hue: var(--part-5);">
+  <div class="card-swatch" aria-hidden="true"></div>
+  <div class="card-body">
+    <span class="card-eyebrow">Post 21 of 21</span>
+    <h3><a href="posts/21-capstone-what-wed-do-differently.html">What We&#39;d Do Differently: Patterns That Held Up and Ones That Didn&#39;t</a></h3>
+    <p class="card-sub">A retrospective, not a victory lap</p>
+    <div class="card-footer">
+      <span>13 min read</span>
+      <span class="card-tags"><span class="pill">EnterpriseAI</span><span class="pill">AIInfrastructure</span></span>
+    </div>
+  </div>
+</article>
+    </div>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="assets/js/main.js"></script>
+
+</body>
+</html>

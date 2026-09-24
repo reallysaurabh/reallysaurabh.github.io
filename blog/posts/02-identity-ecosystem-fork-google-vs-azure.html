@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Workspace vs. Microsoft 365/Azure: How Your Identity Ecosystem Forks Your AI Platform — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="You don&#39;t pick your cloud identity provider. It picks you, sometime around when someone signed a contract you weren&#39;t in the room for.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-0);">
+          <p class="post-eyebrow">The Case, and the Fork · Post 2 of 21</p>
+          <h1>Google Workspace vs. Microsoft 365/Azure: How Your Identity Ecosystem Forks Your AI Platform</h1>
+          <p class="post-subtitle">You don&#39;t pick your cloud identity provider. It picks you, sometime around when someone signed a contract you weren&#39;t in the room for.</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>10 min read</span>
+            <span>1,461 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>If you take nothing else from this post, take this: the decision that will most shape your AI platform&#39;s architecture was probably made by whoever picked your company&#39;s productivity suite, years before anyone thought about agents at all.</p>
+<p>That&#39;s not a complaint, it&#39;s just an observation worth sitting with. Your AI platform doesn&#39;t exist in a vacuum — it exists on top of whatever identity ecosystem your org already committed to. If you&#39;re a Google Workspace shop, the primitives you reach for by default are different than if you&#39;re on Microsoft 365 with Azure underneath. Neither is wrong. But pretending the choice doesn&#39;t ripple through everything downstream is how you end up fighting your own identity provider for a year, which is a genuinely miserable way to spend a year.</p>
+<p>We ended up building on the Microsoft/Azure side, so that&#39;s where our detail is deepest — but the goal here is to give you an honest map of both paths, not a sales pitch for the one we happened to land on.</p>
+<h2 id="fork-1-how-does-an-agent-prove-who-it-is">Fork 1: How does an agent prove who it is?</h2>
+<p>Every agent that calls a downstream service — a database, a storage bucket, another internal API — needs to authenticate as <em>something</em>. The old answer was a long-lived API key or a service account key file sitting on disk somewhere, quietly becoming a liability the moment it&#39;s created. Both major ecosystems have moved past that, but via different primitives.</p>
+<p><strong>On Azure</strong>, the pattern is Workload Identity / Managed Identity plus federated credentials through Entra ID. A workload presents proof of its own identity (a Kubernetes service account token, for example) to Entra, which exchanges it for a short-lived Azure access token. No secret ever gets stored. The federation trust relationship is the thing you configure once; after that, tokens flow on demand.</p>
+<p><strong>On Google Cloud / Workspace</strong>, the equivalent is Workload Identity Federation, often paired with service account impersonation. A workload presents an external identity token, Google&#39;s STS-equivalent exchanges it for a short-lived token tied to a Google service account, and that service account&#39;s permissions — not the workload&#39;s own identity — govern what it can touch.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 920 460" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#444" />
+      </marker>
+    </defs>
+
+    <!-- Start node -->
+    <rect x="360" y="20" width="200" height="50" rx="8" fill="#1a1a1a" />
+    <text x="460" y="50" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">Agent needs to call a service</text>
+
+    <!-- connectors down to two columns -->
+    <line x1="460" y1="70" x2="460" y2="95" stroke="#444" stroke-width="2"/>
+    <line x1="460" y1="95" x2="220" y2="95" stroke="#444" stroke-width="2"/>
+    <line x1="460" y1="95" x2="700" y2="95" stroke="#444" stroke-width="2"/>
+    <line x1="220" y1="95" x2="220" y2="115" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="700" y1="95" x2="700" y2="115" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Column headers -->
+    <text x="220" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#1a73e8">GOOGLE WORKSPACE / GCP</text>
+    <text x="700" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="#0078d4">MICROSOFT 365 / AZURE</text>
+
+    <!-- GCP column boxes -->
+    <rect x="110" y="130" width="220" height="55" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="220" y="153" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Presents external identity token</text>
+    <text x="220" y="171" text-anchor="middle" font-size="11" fill="#555">(e.g. K8s / OIDC token)</text>
+
+    <line x1="220" y1="185" x2="220" y2="205" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="110" y="210" width="220" height="55" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="220" y="233" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Workload Identity Federation</text>
+    <text x="220" y="251" text-anchor="middle" font-size="11" fill="#555">exchanges token, no stored secret</text>
+
+    <line x1="220" y1="265" x2="220" y2="285" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="110" y="290" width="220" height="55" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="220" y="313" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Impersonates service account</text>
+    <text x="220" y="331" text-anchor="middle" font-size="11" fill="#555">scoped permissions apply</text>
+
+    <!-- Azure column boxes -->
+    <rect x="590" y="130" width="220" height="55" rx="8" fill="#e5f1fb" stroke="#0078d4"/>
+    <text x="700" y="153" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Presents workload credential</text>
+    <text x="700" y="171" text-anchor="middle" font-size="11" fill="#555">(e.g. K8s service acct token)</text>
+
+    <line x1="700" y1="185" x2="700" y2="205" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="590" y="210" width="220" height="55" rx="8" fill="#e5f1fb" stroke="#0078d4"/>
+    <text x="700" y="233" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Entra ID federated credential</text>
+    <text x="700" y="251" text-anchor="middle" font-size="11" fill="#555">exchanges token, no stored secret</text>
+
+    <line x1="700" y1="265" x2="700" y2="285" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="590" y="290" width="220" height="55" rx="8" fill="#e5f1fb" stroke="#0078d4"/>
+    <text x="700" y="313" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Managed Identity assumed</text>
+    <text x="700" y="331" text-anchor="middle" font-size="11" fill="#555">scoped RBAC role applies</text>
+
+    <!-- reconverge -->
+    <line x1="220" y1="345" x2="220" y2="375" stroke="#444" stroke-width="2"/>
+    <line x1="700" y1="345" x2="700" y2="375" stroke="#444" stroke-width="2"/>
+    <line x1="220" y1="375" x2="700" y2="375" stroke="#444" stroke-width="2"/>
+    <line x1="460" y1="375" x2="460" y2="395" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="330" y="400" width="260" height="50" rx="8" fill="#1a1a1a"/>
+    <text x="460" y="430" text-anchor="middle" fill="#fff" font-size="13.5" font-weight="600">Short-lived credential, zero secrets stored</text>
+  </svg></div><figcaption>It puts both paths side by side — Google Workspace/GCP on the left, Microsoft 365/Azure on the right — so you can see exactly where the federation flow diverges in the middle and reconverges on the same outcome: a short-lived credential, no stored secret.</figcaption><a class="diagram-standalone-link" href="../diagrams/02-identity-ecosystem-fork.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<p>Functionally these converge on the same outcome: no long-lived secret, short-lived tokens, an auditable trust boundary. The shape of <em>how you configure and reason about that boundary</em> differs enough that we wouldn&#39;t try to write one integration that abstracts both cleanly — we tried, briefly, and it wasn&#39;t worth the complexity it added. We cover this pattern in a lot more depth, including the failure modes of get it wrong, in <a href="13-machine-identity-for-agents.html">post 13</a>.</p>
+<h2 id="fork-2-acting-as-the-user-not-as-the-platform">Fork 2: Acting as the user, not as the platform</h2>
+<p>Say an agent needs to fetch a file from a user&#39;s own drive, or send an email as them, or query a system with the user&#39;s specific permissions rather than some blanket service identity. This is the on-behalf-of problem, and it&#39;s one of the places the two ecosystems diverge the most in how explicit the primitive is.</p>
+<p><strong>Entra ID</strong> has On-Behalf-Of (OBO) as a named, first-class OAuth 2.0 flow: a service holding a token for user A can exchange it for a new token, also scoped to user A, valid for calling a <em>different</em> downstream resource. It&#39;s documented, it&#39;s a standard grant type, and once you&#39;ve implemented it once, every subsequent OBO integration looks the same.</p>
+<p><strong>Google&#39;s ecosystem</strong> gets you to the same place, but the road is different — domain-wide delegation (a service account granted the right to impersonate any user in the domain for specific scopes) or more granular impersonation via short-lived credentials. It&#39;s powerful, but domain-wide delegation in particular is a blunter instrument than OBO — it&#39;s delegation <em>for a whole domain</em>, which means your scoping discipline has to come from how carefully you configure the delegated scopes, not from the primitive itself narrowing things for you.</p>
+<p>Neither path is inherently less secure than the other, but they fail differently when someone&#39;s in a hurry: Entra&#39;s OBO fails by &quot;this specific downstream call didn&#39;t get authorized,&quot; Google&#39;s domain-wide delegation fails, if misconfigured, by &quot;this service account can now act as anyone in the company for this scope.&quot; We&#39;ve come to prefer flows with a narrower blast radius by default, but we&#39;ll be honest that this is partly a comfort-with-the-primitive thing, not a purely objective ranking — teams who live in Google Workspace every day may reasonably feel the opposite about Entra&#39;s model. <a href="14-on-behalf-of-agent-acting-as-user.html">Post 14</a> goes deep on this pattern generically.</p>
+<h2 id="fork-3-where-do-secrets-actually-live">Fork 3: Where do secrets actually live?</h2>
+<p>Every platform eventually has <em>some</em> secret that can&#39;t be federated away entirely — a third-party API credential, a webhook signing secret. Azure gives you Key Vault; Google gives you Secret Manager. Both are solid, both integrate natively with their respective workload identity story, and honestly, at this layer the two are more similar than different — access policies, versioning, audit logging, all present in both.</p>
+<p>Where it gets more interesting is if you&#39;re multi-cloud, or expect to be. A cloud-agnostic secrets layer — something like Vault, run as its own service — buys you one mental model regardless of which cloud a given workload runs in, at the cost of an extra system you now operate yourselves instead of getting for free from the platform. We&#39;ve used both approaches for different pieces of the stack, and we don&#39;t think there&#39;s a universally correct answer here — it depends heavily on whether &quot;multi-cloud&quot; for you means &quot;genuinely running production in two clouds&quot; or &quot;we might, theoretically, someday,&quot; which are very different planning problems.</p>
+<h2 id="fork-4-the-model-plane-itself">Fork 4: The model plane itself</h2>
+<p><strong>Azure</strong> routes you toward Azure OpenAI or Azure AI Foundry as the managed model layer, with model deployments as Azure resources, region and capacity managed like any other Azure service. <strong>Google</strong> routes you toward Vertex AI, with its own model garden, deployment, and quota model.</p>
+<p>The specific vendor-facing names and versions you get from either — a model string, a deployment name, a version tag — are exactly the kind of thing you should <em>not</em> let leak directly into your own platform&#39;s API contract. We&#39;ll make the full case for that in <a href="04-dont-leak-vendor-model-names.html">post 4</a>, but the short version: whichever model plane you&#39;re on, decouple your resource identifier from theirs, because you will regret exposing a string you don&#39;t control as if it were an API contract you do.</p>
+<h2 id="fork-5-how-your-tenant-model-maps-to-environments">Fork 5: How your tenant model maps to environments</h2>
+<p>Google Workspace tends toward a flatter organizational-unit model; Azure AD&#39;s tenant/subscription hierarchy is more nested by default — management groups, subscriptions, resource groups, each a natural boundary. Neither is better for modeling <em>environments</em> (dev/staging/prod), but the Azure hierarchy nudges you toward mapping environments onto subscriptions fairly naturally, while on the Google side you&#39;re more likely to lean on projects and folders to get an equivalent separation. We&#39;ll get concrete about environment topology in <a href="03-environments-not-just-endpoints.html">post 3</a> — worth reading with your own tenant structure in mind, since the &quot;right&quot; mapping really does depend on which hierarchy you&#39;re starting from.</p>
+<h2 id="so-which-one-do-you-pick">So which one do you pick?</h2>
+<p>If you&#39;re reading this pre-decision — genuinely lucky, most orgs aren&#39;t — the honest answer is: you probably don&#39;t pick based on this post. You pick based on where your company already lives, and you build the platform to fit that ecosystem&#39;s grain rather than fighting it.</p>
+<p>Where it gets more interesting is the <em>cloud-agnostic</em> question: should the platform layer itself — the control plane, the budget ledger, the model registry — be written to run on either ecosystem, or should it commit hard to one and move fast? Our honest answer, and we hold this loosely, is: commit to one identity ecosystem for agent authentication and secrets (fighting two federation models at once is a tax with no payoff until you have a real multi-cloud requirement), but keep your core data model and API contracts ecosystem-agnostic from day one, because that decoupling is cheap now and expensive to retrofit later. We&#39;re not fully certain this is the right split for every org&#39;s risk tolerance, and if you&#39;ve made the opposite bet — full multi-cloud from day one — I&#39;d be curious what it cost you and whether it paid off.</p>
+<p>Next up: <a href="03-environments-not-just-endpoints.html">post 3</a>, on why your platform needs actual environments — not just a <code>/prod</code> and a <code>/not-prod</code> — and the governance rule we found ourselves needing the hard way.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #PlatformEngineering #IAM #CloudArchitecture #GoogleWorkspace #Azure #MultiCloud #IdentityManagement</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#PlatformEngineering</span><span class="pill">#IAM</span><span class="pill">#CloudArchitecture</span><span class="pill">#GoogleWorkspace</span><span class="pill">#Azure</span><span class="pill">#MultiCloud</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="01-why-you-need-an-ai-platform.html"><span class="pager-direction">← Previous</span><span class="pager-title">Why You Need an AI Platform, Not Just AI Tools</span></a>
+    <a class="pager-link next" href="03-environments-not-just-endpoints.html"><span class="pager-direction">Next →</span><span class="pager-title">Why Your AI Platform Needs Environments, Not Just Endpoints</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#fork-1-how-does-an-agent-prove-who-it-is">Fork 1: How does an agent prove who it is?</a></li>
+      <li><a href="#fork-2-acting-as-the-user-not-as-the-platform">Fork 2: Acting as the user, not as the platform</a></li>
+      <li><a href="#fork-3-where-do-secrets-actually-live">Fork 3: Where do secrets actually live?</a></li>
+      <li><a href="#fork-4-the-model-plane-itself">Fork 4: The model plane itself</a></li>
+      <li><a href="#fork-5-how-your-tenant-model-maps-to-environments">Fork 5: How your tenant model maps to environments</a></li>
+      <li><a href="#so-which-one-do-you-pick">So which one do you pick?</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>

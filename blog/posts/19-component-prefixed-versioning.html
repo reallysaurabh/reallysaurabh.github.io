@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Component-Prefixed Versioning for a Multi-Binary Platform — Building an Enterprise AI Platform That Scales</title>
+<meta name="description" content="What&#39;s actually running in production shouldn&#39;t require an archaeology degree">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("eap-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+</head>
+<body class="page-post">
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="../index.html">
+      <span>🏗️</span>
+      <span>Enterprise AI Platform<span class="brand-kicker"> · field notes</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="back-link" href="../index.html">← All posts</a>
+      <a class="back-link" href="../../index.html">Saurabh Gupta</a>
+      <button class="theme-toggle" data-theme-toggle type="button" aria-label="Toggle color theme">🌙</button>
+    </div>
+  </div>
+</header>
+<div class="progress-bar" data-progress-bar></div>
+<article class="post-shell">
+  <div class="container">
+    <div class="post-grid">
+      <div>
+        <div class="post-header" style="--part-hue: var(--part-4);">
+          <p class="post-eyebrow">Operating It at Scale · Post 19 of 21</p>
+          <h1>Component-Prefixed Versioning for a Multi-Binary Platform</h1>
+          <p class="post-subtitle">What&#39;s actually running in production shouldn&#39;t require an archaeology degree</p>
+          <div class="post-meta">
+            <span>By <a href="../../index.html">Saurabh Gupta</a></span>
+            <span>8 min read</span>
+            <span>1,096 words</span>
+            <span>Includes diagram</span>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>Ask an operator what version of the API server is running in production, and if the honest answer is &quot;let me check which commit SHA is in the deployment manifest and cross-reference it against the changelog,&quot; you don&#39;t have a versioning scheme. You have a scavenger hunt, and the prize is finding out whether last Tuesday&#39;s bug is still there.</p>
+<p>This is one of the smaller, less glamorous decisions in the whole series — nobody writes a conference talk titled &quot;How We Tag Our Releases&quot; — but it&#39;s one we&#39;d genuinely put near the top of the list of things worth getting right early, because the cost of getting it wrong compounds quietly for years.</p>
+<h2 id="the-problem-one-repo-several-things-that-ship-independently">The problem: one repo, several things that ship independently</h2>
+<p>A platform like the one we&#39;ve been describing across this series rarely ships as a single binary. There&#39;s a CLI developers install locally. There&#39;s a control plane that gets deployed to a cluster. There&#39;s often a proxy or gateway component sitting in the request path. These live in the same monorepo — sensible, since they share types, share tooling, share a review process — but they absolutely do not ship on the same schedule. A CLI fix shouldn&#39;t force a control-plane redeploy. A control-plane hotfix shouldn&#39;t force everyone to reinstall the CLI.</p>
+<p>Plain semantic versioning (<code>v2.3.1</code>) works beautifully when there&#39;s one thing to version. The moment there are three independently-releasable components sharing a repo, a bare <code>v2.3.1</code> tag becomes a question instead of an answer: version 2.3.1 of <em>what</em>, exactly?</p>
+<h2 id="what-we-landed-on-prefix-the-component-into-the-tag">What we landed on: prefix the component into the tag</h2>
+<p>The fix we&#39;ve used is boring in the best way — prefix the semver tag with the component name: <code>cli-v2.3.0</code>, <code>controlplane-v1.14.2</code>, <code>proxy-v0.9.4</code>. Each component gets its own independent version lineage, bumped only when <em>that</em> component changes, tagged and released through its own pipeline trigger.</p>
+<figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#555"/>
+      </marker>
+    </defs>
+
+    <!-- monorepo box -->
+    <rect x="20" y="20" width="960" height="260" rx="10" fill="#f7f7f7" stroke="#ccc" stroke-dasharray="4,3"/>
+    <text x="40" y="42" font-size="13" font-weight="700" fill="#555">MONOREPO</text>
+
+    <!-- CLI lane -->
+    <text x="50" y="80" font-size="13" font-weight="700" fill="#274b7a">CLI</text>
+    <line x1="50" y1="95" x2="600" y2="95" stroke="#bbb" stroke-width="2"/>
+    <circle cx="120" cy="95" r="5" fill="#7fa8e0"/><text x="120" y="115" font-size="10.5" text-anchor="middle">cli-v2.1.0</text>
+    <circle cx="280" cy="95" r="5" fill="#7fa8e0"/><text x="280" y="115" font-size="10.5" text-anchor="middle">cli-v2.2.0</text>
+    <circle cx="470" cy="95" r="5" fill="#274b7a"/><text x="470" y="115" font-size="10.5" text-anchor="middle" font-weight="700">cli-v2.3.0</text>
+
+    <!-- Control plane lane -->
+    <text x="50" y="155" font-size="13" font-weight="700" fill="#7a4a1a">Control Plane</text>
+    <line x1="50" y1="170" x2="600" y2="170" stroke="#bbb" stroke-width="2"/>
+    <circle cx="160" cy="170" r="5" fill="#e0a95f"/><text x="160" y="190" font-size="10.5" text-anchor="middle">controlplane-v1.13.0</text>
+    <circle cx="360" cy="170" r="5" fill="#7a4a1a"/><text x="360" y="190" font-size="10.5" text-anchor="middle" font-weight="700">controlplane-v1.14.2</text>
+    <circle cx="500" cy="170" r="5" fill="#c0392b" stroke="#c0392b"/><text x="500" y="190" font-size="9.5" text-anchor="middle" fill="#c0392b">-dev.a1b2c3 (unpromotable)</text>
+
+    <!-- Proxy lane -->
+    <text x="50" y="230" font-size="13" font-weight="700" fill="#2c6e2f">Proxy</text>
+    <line x1="50" y1="245" x2="600" y2="245" stroke="#bbb" stroke-width="2"/>
+    <circle cx="200" cy="245" r="5" fill="#7bc47f"/><text x="200" y="265" font-size="10.5" text-anchor="middle">proxy-v0.8.2</text>
+    <circle cx="420" cy="245" r="5" fill="#2c6e2f"/><text x="420" y="265" font-size="10.5" text-anchor="middle" font-weight="700">proxy-v0.9.4</text>
+
+    <!-- arrows into pipeline -->
+    <line x1="470" y1="95" x2="700" y2="150" stroke="#274b7a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="360" y1="170" x2="700" y2="150" stroke="#7a4a1a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <line x1="420" y1="245" x2="700" y2="150" stroke="#2c6e2f" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+    <!-- pipeline box -->
+    <rect x="700" y="90" width="240" height="120" rx="8" fill="#eef4ff" stroke="#7fa8e0"/>
+    <text x="820" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="#274b7a">Tag-Triggered</text>
+    <text x="820" y="138" text-anchor="middle" font-size="13" font-weight="700" fill="#274b7a">Release Pipeline</text>
+    <text x="820" y="162" text-anchor="middle" font-size="10.5" fill="#4a4a4a">builds only the tagged</text>
+    <text x="820" y="176" text-anchor="middle" font-size="10.5" fill="#4a4a4a">component, produces one</text>
+    <text x="820" y="190" text-anchor="middle" font-size="10.5" fill="#4a4a4a">immutable artifact</text>
+
+    <!-- output -->
+    <line x1="820" y1="210" x2="820" y2="250" stroke="#555" stroke-width="1.6" marker-end="url(#arrow2)"/>
+    <rect x="700" y="255" width="240" height="45" rx="8" fill="#f0fff0" stroke="#7bc47f"/>
+    <text x="820" y="282" text-anchor="middle" font-size="12" font-weight="600" fill="#2c6e2f">Deployed with a real, auditable version string</text>
+
+    <text x="40" y="315" font-size="11" fill="#888">Solid dots = tagged releases · red dot = ad-hoc dev build, structurally unpromotable</text>
+  </svg></div><figcaption>it shows the monorepo containing three components, each with an independent version-tag timeline, converging into a release pipeline that produces immutable, individually-versioned artifacts.</figcaption><a class="diagram-standalone-link" href="../diagrams/19-component-versioning.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+<p>The part that actually pays off isn&#39;t the naming convention itself — it&#39;s what it enables downstream:</p>
+<ul>
+<li><strong>&quot;What&#39;s running in prod&quot; becomes a real, greppable string</strong>, not a commit SHA someone has to look up in a spreadsheet nobody maintains past the first quarter.</li>
+<li><strong>Rollback becomes &quot;redeploy <code>controlplane-v1.14.1</code>,&quot;</strong> a sentence a human can say out loud in an incident channel, rather than &quot;redeploy the commit from before the bad one, which was... hang on.&quot;</li>
+<li><strong>Release notes attach to something meaningful.</strong> &quot;What changed in <code>cli-v2.3.0</code>&quot; is an answerable question. &quot;What changed since yesterday&quot; is not, once three components are shipping on independent cadences.</li>
+<li><strong>Compliance and audit conversations get a lot shorter.</strong> &quot;Which version of the control plane processed this request on this date&quot; turning into an actual lookup instead of a forensic reconstruction is worth more than it sounds like on paper.</li>
+</ul>
+<p>We don&#39;t think this is the only workable scheme — some teams we&#39;ve talked to prefer separate repos per component specifically to avoid this problem, and that&#39;s a legitimate trade-off too (you get clean independent versioning for free, at the cost of the shared-tooling convenience a monorepo gives you). We&#39;ve stayed with prefixed tags in a monorepo because the shared-code benefits outweighed the versioning awkwardness for us, but we&#39;d be lying if we said this was obviously correct rather than &quot;the trade-off we were willing to make.&quot;</p>
+<h2 id="the-other-half-making-developer-builds-unmistakably-not-production">The other half: making developer builds unmistakably not-production</h2>
+<p>Prefixed release tags solve &quot;what&#39;s a real release.&quot; They don&#39;t automatically solve the adjacent problem: developers build and run this stuff constantly during normal work, and some of those artifacts get pushed somewhere for testing, sharing, or debugging. If a developer&#39;s ad-hoc build of the control plane can end up looking, in a registry or artifact list, indistinguishable from an actual release candidate, you&#39;ve built a trap that&#39;s waiting for a tired engineer on a Friday afternoon.</p>
+<p>The fix here is naming discipline as a safety mechanism rather than a cosmetic one: ad-hoc builds get an unmistakable, unpromotable suffix — <code>controlplane-v1.14.2-dev.a1b2c3</code>, or a clearly separate channel/registry path entirely. The goal isn&#39;t just readability. It&#39;s that nobody — not a script, not a human skimming a list at 6 p.m. — can mistake a snapshot build for a release candidate and promote it by mistake. A little redundancy in the naming (component <em>and</em> channel <em>and</em>, ideally, a build identifier) is cheap insurance against a very expensive kind of mistake.</p>
+<h2 id="a-small-hypothetical-example">A small, hypothetical example</h2>
+<p>Picture a platform with the three components above, and an on-call engineer paged at 1 a.m. because the control plane is throwing errors after a deploy twenty minutes earlier. With component-prefixed tags, the incident channel message is: &quot;rolling back to <code>controlplane-v1.14.1</code>, redeploying now.&quot; Without them, the message is: &quot;trying to figure out what commit was deployed twenty minutes ago, one second.&quot; Both engineers fix the problem eventually. Only one of them gets back to sleep at a reasonable hour.</p>
+<h2 id="pitfalls">Pitfalls</h2>
+<ul>
+<li><strong>Letting the tagging scheme be a suggestion rather than a pipeline gate.</strong> If a human can push a differently-shaped tag and have it accepted, eventually one will, usually under deadline pressure, usually right before the incident that makes you wish you&#39;d enforced it.</li>
+<li><strong>Forgetting that shared code needs its own versioning story.</strong> If the CLI, control plane, and proxy share an internal library, that library&#39;s changes ripple across component version bumps in ways that aren&#39;t always obvious from the tag alone — worth documenting, not worth over-engineering.</li>
+<li><strong>Treating this as solved once the scheme is written down.</strong> The value is entirely in enforcement — a tag naming convention nobody&#39;s pipeline actually checks is just a really specific suggestion.</li>
+<li><strong>Over-indexing on the scheme and under-indexing on the &quot;why.&quot;</strong> The naming convention is the boring part. The reason it matters — being able to answer &quot;what&#39;s running, and can I safely roll it back&quot; without opening three other tools — is the part worth actually caring about.</li>
+</ul>
+<p>If you&#39;ve solved this differently — separate repos, a single unified version across all components, something else entirely — we&#39;d genuinely like to know how it&#39;s held up, because we suspect there&#39;s more than one reasonable answer here and we&#39;ve only tried one of them at scale.</p>
+<p>Next up: <strong>&quot;Don&#39;t Bolt Observability Onto the Request Path — Fork It&quot;</strong> — because the same instinct toward &quot;know what&#39;s actually happening&quot; applies just as much to telemetry as it does to release tags.</p>
+<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #PlatformEngineering #DevOps #ReleaseEngineering #SemVer #CICD #Monorepo</p>
+
+          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#PlatformEngineering</span><span class="pill">#DevOps</span><span class="pill">#ReleaseEngineering</span><span class="pill">#SemVer</span><span class="pill">#CICD</span><span class="pill">#Monorepo</span></div>
+        </div>
+        <div class="post-pager">
+    <a class="pager-link prev" href="18-threat-model-at-the-edge-of-llm-gateway.html"><span class="pager-direction">← Previous</span><span class="pager-title">The Threat Model at the Edge of an LLM Gateway</span></a>
+    <a class="pager-link next" href="20-dont-bolt-on-observability-fork-it.html"><span class="pager-direction">Next →</span><span class="pager-title">Don&#39;t Bolt Observability Onto the Request Path — Fork It</span></a>
+  </div>
+      </div>
+      <aside class="post-toc" aria-label="On this page">
+    <p class="toc-label">On this page</p>
+    <ol>
+      <li><a href="#the-problem-one-repo-several-things-that-ship-independently">The problem: one repo, several things that ship independently</a></li>
+      <li><a href="#what-we-landed-on-prefix-the-component-into-the-tag">What we landed on: prefix the component into the tag</a></li>
+      <li><a href="#the-other-half-making-developer-builds-unmistakably-not-production">The other half: making developer builds unmistakably not-production</a></li>
+      <li><a href="#a-small-hypothetical-example">A small, hypothetical example</a></li>
+      <li><a href="#pitfalls">Pitfalls</a></li>
+    </ol>
+  </aside>
+    </div>
+  </div>
+</article>
+<footer class="site-footer">
+  <div class="container">
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
+    <span>Genericized patterns — not a case study of any one company.</span>
+  </div>
+</footer>
+<script src="../assets/js/main.js"></script>
+
+</body>
+</html>
