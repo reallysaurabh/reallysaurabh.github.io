@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Component-Prefixed Versioning for a Multi-Binary Platform — Building an Enterprise AI Platform That Scales</title>
+<title>Component-Prefixed Versioning for a Multi-Binary Platform - Building an Enterprise AI Platform That Scales</title>
 <meta name="description" content="What&#39;s actually running in production shouldn&#39;t require an archaeology degree">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,12 +53,12 @@
         </div>
         <div class="post-body">
           <p>Ask an operator what version of the API server is running in production, and if the honest answer is &quot;let me check which commit SHA is in the deployment manifest and cross-reference it against the changelog,&quot; you don&#39;t have a versioning scheme. You have a scavenger hunt, and the prize is finding out whether last Tuesday&#39;s bug is still there.</p>
-<p>This is one of the smaller, less glamorous decisions in the whole series — nobody writes a conference talk titled &quot;How We Tag Our Releases&quot; — but it&#39;s one we&#39;d genuinely put near the top of the list of things worth getting right early, because the cost of getting it wrong compounds quietly for years.</p>
+<p>This is one of the smaller, less glamorous decisions in the whole series - nobody writes a conference talk titled &quot;How We Tag Our Releases&quot; - but it&#39;s one we&#39;d genuinely put near the top of the list of things worth getting right early, because the cost of getting it wrong compounds quietly for years.</p>
 <h2 id="the-problem-one-repo-several-things-that-ship-independently">The problem: one repo, several things that ship independently</h2>
-<p>A platform like the one we&#39;ve been describing across this series rarely ships as a single binary. There&#39;s a CLI developers install locally. There&#39;s a control plane that gets deployed to a cluster. There&#39;s often a proxy or gateway component sitting in the request path. These live in the same monorepo — sensible, since they share types, share tooling, share a review process — but they absolutely do not ship on the same schedule. A CLI fix shouldn&#39;t force a control-plane redeploy. A control-plane hotfix shouldn&#39;t force everyone to reinstall the CLI.</p>
+<p>A platform like the one we&#39;ve been describing across this series rarely ships as a single binary. There&#39;s a CLI developers install locally. There&#39;s a control plane that gets deployed to a cluster. There&#39;s often a proxy or gateway component sitting in the request path. These live in the same monorepo - sensible, since they share types, share tooling, share a review process - but they absolutely do not ship on the same schedule. A CLI fix shouldn&#39;t force a control-plane redeploy. A control-plane hotfix shouldn&#39;t force everyone to reinstall the CLI.</p>
 <p>Plain semantic versioning (<code>v2.3.1</code>) works beautifully when there&#39;s one thing to version. The moment there are three independently-releasable components sharing a repo, a bare <code>v2.3.1</code> tag becomes a question instead of an answer: version 2.3.1 of <em>what</em>, exactly?</p>
 <h2 id="what-we-landed-on-prefix-the-component-into-the-tag">What we landed on: prefix the component into the tag</h2>
-<p>The fix we&#39;ve used is boring in the best way — prefix the semver tag with the component name: <code>cli-v2.3.0</code>, <code>controlplane-v1.14.2</code>, <code>proxy-v0.9.4</code>. Each component gets its own independent version lineage, bumped only when <em>that</em> component changes, tagged and released through its own pipeline trigger.</p>
+<p>The fix we&#39;ve used is boring in the best way - prefix the semver tag with the component name: <code>cli-v2.3.0</code>, <code>controlplane-v1.14.2</code>, <code>proxy-v0.9.4</code>. Each component gets its own independent version lineage, bumped only when <em>that</em> component changes, tagged and released through its own pipeline trigger.</p>
 <figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -110,35 +110,35 @@
 
     <text x="40" y="315" font-size="11" fill="#888">Solid dots = tagged releases · red dot = ad-hoc dev build, structurally unpromotable</text>
   </svg></div><figcaption>it shows the monorepo containing three components, each with an independent version-tag timeline, converging into a release pipeline that produces immutable, individually-versioned artifacts.</figcaption><a class="diagram-standalone-link" href="../diagrams/19-component-versioning.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
-<p>The part that actually pays off isn&#39;t the naming convention itself — it&#39;s what it enables downstream:</p>
+<p>The part that actually pays off isn&#39;t the naming convention itself - it&#39;s what it enables downstream:</p>
 <ul>
 <li><strong>&quot;What&#39;s running in prod&quot; becomes a real, greppable string</strong>, not a commit SHA someone has to look up in a spreadsheet nobody maintains past the first quarter.</li>
 <li><strong>Rollback becomes &quot;redeploy <code>controlplane-v1.14.1</code>,&quot;</strong> a sentence a human can say out loud in an incident channel, rather than &quot;redeploy the commit from before the bad one, which was... hang on.&quot;</li>
 <li><strong>Release notes attach to something meaningful.</strong> &quot;What changed in <code>cli-v2.3.0</code>&quot; is an answerable question. &quot;What changed since yesterday&quot; is not, once three components are shipping on independent cadences.</li>
 <li><strong>Compliance and audit conversations get a lot shorter.</strong> &quot;Which version of the control plane processed this request on this date&quot; turning into an actual lookup instead of a forensic reconstruction is worth more than it sounds like on paper.</li>
 </ul>
-<p>We don&#39;t think this is the only workable scheme — some teams we&#39;ve talked to prefer separate repos per component specifically to avoid this problem, and that&#39;s a legitimate trade-off too (you get clean independent versioning for free, at the cost of the shared-tooling convenience a monorepo gives you). We&#39;ve stayed with prefixed tags in a monorepo because the shared-code benefits outweighed the versioning awkwardness for us, but we&#39;d be lying if we said this was obviously correct rather than &quot;the trade-off we were willing to make.&quot;</p>
+<p>We don&#39;t think this is the only workable scheme - some teams we&#39;ve talked to prefer separate repos per component specifically to avoid this problem, and that&#39;s a legitimate trade-off too (you get clean independent versioning for free, at the cost of the shared-tooling convenience a monorepo gives you). We&#39;ve stayed with prefixed tags in a monorepo because the shared-code benefits outweighed the versioning awkwardness for us, but we&#39;d be lying if we said this was obviously correct rather than &quot;the trade-off we were willing to make.&quot;</p>
 <h2 id="the-other-half-making-developer-builds-unmistakably-not-production">The other half: making developer builds unmistakably not-production</h2>
 <p>Prefixed release tags solve &quot;what&#39;s a real release.&quot; They don&#39;t automatically solve the adjacent problem: developers build and run this stuff constantly during normal work, and some of those artifacts get pushed somewhere for testing, sharing, or debugging. If a developer&#39;s ad-hoc build of the control plane can end up looking, in a registry or artifact list, indistinguishable from an actual release candidate, you&#39;ve built a trap that&#39;s waiting for a tired engineer on a Friday afternoon.</p>
-<p>The fix here is naming discipline as a safety mechanism rather than a cosmetic one: ad-hoc builds get an unmistakable, unpromotable suffix — <code>controlplane-v1.14.2-dev.a1b2c3</code>, or a clearly separate channel/registry path entirely. The goal isn&#39;t just readability. It&#39;s that nobody — not a script, not a human skimming a list at 6 p.m. — can mistake a snapshot build for a release candidate and promote it by mistake. A little redundancy in the naming (component <em>and</em> channel <em>and</em>, ideally, a build identifier) is cheap insurance against a very expensive kind of mistake.</p>
+<p>The fix here is naming discipline as a safety mechanism rather than a cosmetic one: ad-hoc builds get an unmistakable, unpromotable suffix - <code>controlplane-v1.14.2-dev.a1b2c3</code>, or a clearly separate channel/registry path entirely. The goal isn&#39;t just readability. It&#39;s that nobody - not a script, not a human skimming a list at 6 p.m. - can mistake a snapshot build for a release candidate and promote it by mistake. A little redundancy in the naming (component <em>and</em> channel <em>and</em>, ideally, a build identifier) is cheap insurance against a very expensive kind of mistake.</p>
 <h2 id="a-small-hypothetical-example">A small, hypothetical example</h2>
 <p>Picture a platform with the three components above, and an on-call engineer paged at 1 a.m. because the control plane is throwing errors after a deploy twenty minutes earlier. With component-prefixed tags, the incident channel message is: &quot;rolling back to <code>controlplane-v1.14.1</code>, redeploying now.&quot; Without them, the message is: &quot;trying to figure out what commit was deployed twenty minutes ago, one second.&quot; Both engineers fix the problem eventually. Only one of them gets back to sleep at a reasonable hour.</p>
 <h2 id="pitfalls">Pitfalls</h2>
 <ul>
 <li><strong>Letting the tagging scheme be a suggestion rather than a pipeline gate.</strong> If a human can push a differently-shaped tag and have it accepted, eventually one will, usually under deadline pressure, usually right before the incident that makes you wish you&#39;d enforced it.</li>
-<li><strong>Forgetting that shared code needs its own versioning story.</strong> If the CLI, control plane, and proxy share an internal library, that library&#39;s changes ripple across component version bumps in ways that aren&#39;t always obvious from the tag alone — worth documenting, not worth over-engineering.</li>
-<li><strong>Treating this as solved once the scheme is written down.</strong> The value is entirely in enforcement — a tag naming convention nobody&#39;s pipeline actually checks is just a really specific suggestion.</li>
-<li><strong>Over-indexing on the scheme and under-indexing on the &quot;why.&quot;</strong> The naming convention is the boring part. The reason it matters — being able to answer &quot;what&#39;s running, and can I safely roll it back&quot; without opening three other tools — is the part worth actually caring about.</li>
+<li><strong>Forgetting that shared code needs its own versioning story.</strong> If the CLI, control plane, and proxy share an internal library, that library&#39;s changes ripple across component version bumps in ways that aren&#39;t always obvious from the tag alone - worth documenting, not worth over-engineering.</li>
+<li><strong>Treating this as solved once the scheme is written down.</strong> The value is entirely in enforcement - a tag naming convention nobody&#39;s pipeline actually checks is just a really specific suggestion.</li>
+<li><strong>Over-indexing on the scheme and under-indexing on the &quot;why.&quot;</strong> The naming convention is the boring part. The reason it matters - being able to answer &quot;what&#39;s running, and can I safely roll it back&quot; without opening three other tools - is the part worth actually caring about.</li>
 </ul>
-<p>If you&#39;ve solved this differently — separate repos, a single unified version across all components, something else entirely — we&#39;d genuinely like to know how it&#39;s held up, because we suspect there&#39;s more than one reasonable answer here and we&#39;ve only tried one of them at scale.</p>
-<p>Next up: <strong>&quot;Don&#39;t Bolt Observability Onto the Request Path — Fork It&quot;</strong> — because the same instinct toward &quot;know what&#39;s actually happening&quot; applies just as much to telemetry as it does to release tags.</p>
+<p>If you&#39;ve solved this differently - separate repos, a single unified version across all components, something else entirely - we&#39;d genuinely like to know how it&#39;s held up, because we suspect there&#39;s more than one reasonable answer here and we&#39;ve only tried one of them at scale.</p>
+<p>Next up: <strong>&quot;Don&#39;t Bolt Observability Onto the Request Path - Fork It&quot;</strong> - because the same instinct toward &quot;know what&#39;s actually happening&quot; applies just as much to telemetry as it does to release tags.</p>
 <p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #PlatformEngineering #DevOps #ReleaseEngineering #SemVer #CICD #Monorepo</p>
 
           <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#PlatformEngineering</span><span class="pill">#DevOps</span><span class="pill">#ReleaseEngineering</span><span class="pill">#SemVer</span><span class="pill">#CICD</span><span class="pill">#Monorepo</span></div>
         </div>
         <div class="post-pager">
     <a class="pager-link prev" href="18-threat-model-at-the-edge-of-llm-gateway.html"><span class="pager-direction">← Previous</span><span class="pager-title">The Threat Model at the Edge of an LLM Gateway</span></a>
-    <a class="pager-link next" href="20-dont-bolt-on-observability-fork-it.html"><span class="pager-direction">Next →</span><span class="pager-title">Don&#39;t Bolt Observability Onto the Request Path — Fork It</span></a>
+    <a class="pager-link next" href="20-dont-bolt-on-observability-fork-it.html"><span class="pager-direction">Next →</span><span class="pager-title">Don&#39;t Bolt Observability Onto the Request Path - Fork It</span></a>
   </div>
       </div>
       <aside class="post-toc" aria-label="On this page">
@@ -156,8 +156,7 @@
 </article>
 <footer class="site-footer">
   <div class="container">
-    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
-    <span>Genericized patterns — not a case study of any one company.</span>
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · Allow me to help build your Enterprise AI platform</span>
   </div>
 </footer>
 <script src="../assets/js/main.js"></script>

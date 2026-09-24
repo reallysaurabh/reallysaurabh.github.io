@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Multi-Cloud Infrastructure as Code: Foundation vs. Per-Resource Provisioning — Building an Enterprise AI Platform That Scales</title>
+<title>Multi-Cloud Infrastructure as Code: Foundation vs. Per-Resource Provisioning - Building an Enterprise AI Platform That Scales</title>
 <meta name="description" content="Someone deletes a &#39;resource.&#39; The shared networking everyone depends on goes with it. Nobody meant for this to happen. It happened anyway.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,13 +52,13 @@
           </div>
         </div>
         <div class="post-body">
-          <p>There are two very different kinds of infrastructure hiding under the single word &quot;provisioning,&quot; and conflating them is one of the more expensive mistakes we&#39;ve made building this platform — expensive enough that we&#39;re fairly confident in flagging it early, even while we&#39;re less confident we&#39;ve got every detail of the split exactly right.</p>
+          <p>There are two very different kinds of infrastructure hiding under the single word &quot;provisioning,&quot; and conflating them is one of the more expensive mistakes we&#39;ve made building this platform - expensive enough that we&#39;re fairly confident in flagging it early, even while we&#39;re less confident we&#39;ve got every detail of the split exactly right.</p>
 <h2 id="two-kinds-of-infrastructure-one-word">Two kinds of infrastructure, one word</h2>
 <p><strong>Foundation infrastructure</strong> is the stuff provisioned once per account or region and meant to sit there, quietly, for years: shared networking, base IAM roles and federation trust relationships, the account-level scaffolding that everything else assumes exists. Nobody creates a new one of these every time a customer signs up. It&#39;s provisioned deliberately, rarely, usually by a small number of people who think hard about it first.</p>
-<p><strong>Per-resource infrastructure</strong> is the opposite: created and destroyed constantly, one instance per logical resource in your platform — a model deployment, an agent&#39;s runtime environment, a pipeline execution&#39;s scratch storage. It&#39;s templated, it&#39;s routine, and it should be about as exciting to create or delete as adding a row to a database table.</p>
+<p><strong>Per-resource infrastructure</strong> is the opposite: created and destroyed constantly, one instance per logical resource in your platform - a model deployment, an agent&#39;s runtime environment, a pipeline execution&#39;s scratch storage. It&#39;s templated, it&#39;s routine, and it should be about as exciting to create or delete as adding a row to a database table.</p>
 <p>The trouble starts when a platform&#39;s tooling doesn&#39;t clearly separate these two, and &quot;delete this resource&quot; ends up structurally capable of reaching into and tearing down something in the foundation layer.</p>
 <h2 id="what-it-looks-like-when-this-goes-wrong">What it looks like when this goes wrong</h2>
-<p>Here&#39;s a version of the scenario that&#39;s easy to imagine happening to a scaling logistics company running AI infrastructure across two cloud regions: a per-resource deprovisioning routine is written to &quot;clean up everything associated with this resource,&quot; and — because the resource&#39;s provisioning template happened to also touch a piece of shared networking config, maybe just to attach it — the cleanup routine tears that shared piece down too, on the theory that if it created it, it can also delete it.</p>
+<p>Here&#39;s a version of the scenario that&#39;s easy to imagine happening to a scaling logistics company running AI infrastructure across two cloud regions: a per-resource deprovisioning routine is written to &quot;clean up everything associated with this resource,&quot; and - because the resource&#39;s provisioning template happened to also touch a piece of shared networking config, maybe just to attach it - the cleanup routine tears that shared piece down too, on the theory that if it created it, it can also delete it.</p>
 <p>Except it didn&#39;t create it. It reused something that was already there, that a dozen other resources also depend on. The deprovisioning succeeds without complaint, exactly as designed, and a few minutes later some completely unrelated team&#39;s traffic starts failing in a way nobody would think to connect to &quot;someone deleted an AI agent that had nothing to do with them.&quot;</p>
 <figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -71,7 +71,7 @@
     </defs>
 
     <!-- per-resource layer -->
-    <text x="450" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#444">PER-RESOURCE LAYER — frequently created / destroyed</text>
+    <text x="450" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#444">PER-RESOURCE LAYER - frequently created / destroyed</text>
     <rect x="60" y="45" width="150" height="60" rx="8" fill="#e8f0fe" stroke="#1a73e8"/>
     <text x="135" y="72" text-anchor="middle" font-size="12">Model deploy A</text>
     <text x="135" y="90" text-anchor="middle" font-size="10.5" fill="#555">step 1 → step 2</text>
@@ -99,11 +99,11 @@
     <line x1="315" y1="105" x2="360" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
     <line x1="495" y1="160" x2="500" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
     <line x1="675" y1="105" x2="650" y2="230" stroke="#888" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow4)"/>
-    <text x="450" y="200" text-anchor="middle" font-size="11" fill="#888">reads / references only — never creates or deletes</text>
+    <text x="450" y="200" text-anchor="middle" font-size="11" fill="#888">reads / references only - never creates or deletes</text>
 
     <!-- foundation layer -->
     <rect x="60" y="235" width="780" height="130" rx="10" fill="#f4f4f4" stroke="#666" stroke-width="2"/>
-    <text x="450" y="260" text-anchor="middle" font-size="14" font-weight="700" fill="#333">FOUNDATION LAYER — provisioned once, long-lived</text>
+    <text x="450" y="260" text-anchor="middle" font-size="14" font-weight="700" fill="#333">FOUNDATION LAYER - provisioned once, long-lived</text>
     <rect x="90" y="280" width="220" height="60" rx="6" fill="#e6e6e6" stroke="#666"/>
     <text x="200" y="308" text-anchor="middle" font-size="12">Shared networking</text>
     <text x="200" y="324" text-anchor="middle" font-size="10.5" fill="#555">provisioned per account/region</text>
@@ -117,16 +117,16 @@
     <text x="700" y="324" text-anchor="middle" font-size="10.5" fill="#555">exists before demand does</text>
 
     <text x="450" y="400" text-anchor="middle" font-size="12" fill="#8f2c2c" font-weight="600">Deleting a per-resource stack must never reach this layer.</text>
-  </svg></div><figcaption>It shows the foundation layer sitting underneath, long-lived and rarely touched, with per-resource stacks provisioned on top of it — plus the saga/compensation rollback path that fires when a per-resource provision fails partway through.</figcaption><a class="diagram-standalone-link" href="../diagrams/05-foundation-vs-per-resource.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
+  </svg></div><figcaption>It shows the foundation layer sitting underneath, long-lived and rarely touched, with per-resource stacks provisioned on top of it - plus the saga/compensation rollback path that fires when a per-resource provision fails partway through.</figcaption><a class="diagram-standalone-link" href="../diagrams/05-foundation-vs-per-resource.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
 <h2 id="the-fix-a-hard-line-enforced-by-structure-not-by-good-intentions">The fix: a hard line, enforced by structure, not by good intentions</h2>
-<p>The rule we landed on is blunt on purpose: per-resource provisioning is only ever allowed to create and destroy things scoped to that one resource. It can <em>reference</em> foundation infrastructure — read a shared network ID, assume a role that already exists — but it structurally cannot create or delete anything at the foundation layer. That boundary lives in the tooling, not in a wiki page asking people to be careful, because &quot;please be careful&quot; is not infrastructure — it&#39;s a wish.</p>
-<p>The corollary that matters just as much: foundation infrastructure changes go through a much heavier, much less frequent process — deliberately so. If provisioning a new region&#39;s networking feels like it should take a thoughtful afternoon and a review, and provisioning one more model deployment should take seconds and no review at all, that asymmetry is a feature, not an inconsistency. Different blast radii deserve different amounts of friction.</p>
+<p>The rule we landed on is blunt on purpose: per-resource provisioning is only ever allowed to create and destroy things scoped to that one resource. It can <em>reference</em> foundation infrastructure - read a shared network ID, assume a role that already exists - but it structurally cannot create or delete anything at the foundation layer. That boundary lives in the tooling, not in a wiki page asking people to be careful, because &quot;please be careful&quot; is not infrastructure - it&#39;s a wish.</p>
+<p>The corollary that matters just as much: foundation infrastructure changes go through a much heavier, much less frequent process - deliberately so. If provisioning a new region&#39;s networking feels like it should take a thoughtful afternoon and a review, and provisioning one more model deployment should take seconds and no review at all, that asymmetry is a feature, not an inconsistency. Different blast radii deserve different amounts of friction.</p>
 <h2 id="saga-style-compensation-for-the-routine-layer">Saga-style compensation for the routine layer</h2>
-<p>Because per-resource provisioning happens constantly, failures partway through are not an edge case — they&#39;re a Tuesday. A model deployment might succeed at step one (register the resource), fail at step two (provision the compute), and now you need to roll back step one cleanly, not leave a half-created resource sitting around confusing everyone who queries the registry.</p>
-<p>We use a saga pattern here: each per-resource provisioning step has a defined compensating action, and a failure at any step triggers the compensations for everything that already succeeded, in reverse order. This is well-trodden ground in distributed systems generally — nothing AI-specific about it — but it&#39;s easy to skip when a platform is young and every provisioning path was written assuming the happy path, because the happy path is the one anyone tests first.</p>
+<p>Because per-resource provisioning happens constantly, failures partway through are not an edge case - they&#39;re a Tuesday. A model deployment might succeed at step one (register the resource), fail at step two (provision the compute), and now you need to roll back step one cleanly, not leave a half-created resource sitting around confusing everyone who queries the registry.</p>
+<p>We use a saga pattern here: each per-resource provisioning step has a defined compensating action, and a failure at any step triggers the compensations for everything that already succeeded, in reverse order. This is well-trodden ground in distributed systems generally - nothing AI-specific about it - but it&#39;s easy to skip when a platform is young and every provisioning path was written assuming the happy path, because the happy path is the one anyone tests first.</p>
 <h2 id="what-we39re-less-sure-about">What we&#39;re less sure about</h2>
-<p>Where we&#39;ve gone back and forth: how much foundation infrastructure to provision <em>ahead</em> of demand (one region, ready before the first resource needs it) versus reactively, the first time something in a new region actually needs it. Ahead-of-demand is simpler to reason about but means paying for and maintaining capacity nobody&#39;s using yet; reactive is leaner but adds a &quot;first resource in a new region&quot; code path that&#39;s exercised rarely enough to be a little scary. We&#39;ve mostly leaned ahead-of-demand for regions, reactive for smaller shared components — but this doesn&#39;t feel like a universal answer, more like a judgment call that depends on how predictable your growth actually is. Curious how others have drawn this line.</p>
-<p>Next: <a href="06-secretless-provisioning-federated-identity.html">post 6</a>, on the identity side of provisioning — getting rid of long-lived cloud credentials in the pipelines that do all this creating and destroying in the first place.</p>
+<p>Where we&#39;ve gone back and forth: how much foundation infrastructure to provision <em>ahead</em> of demand (one region, ready before the first resource needs it) versus reactively, the first time something in a new region actually needs it. Ahead-of-demand is simpler to reason about but means paying for and maintaining capacity nobody&#39;s using yet; reactive is leaner but adds a &quot;first resource in a new region&quot; code path that&#39;s exercised rarely enough to be a little scary. We&#39;ve mostly leaned ahead-of-demand for regions, reactive for smaller shared components - but this doesn&#39;t feel like a universal answer, more like a judgment call that depends on how predictable your growth actually is. Curious how others have drawn this line.</p>
+<p>Next: <a href="06-secretless-provisioning-federated-identity.html">post 6</a>, on the identity side of provisioning - getting rid of long-lived cloud credentials in the pipelines that do all this creating and destroying in the first place.</p>
 <p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIPlatform #InfrastructureAsCode #MultiCloud #CloudArchitecture #PlatformEngineering #DevOps #AIInfrastructure #Pulumi</p>
 
           <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIPlatform</span><span class="pill">#InfrastructureAsCode</span><span class="pill">#MultiCloud</span><span class="pill">#CloudArchitecture</span><span class="pill">#PlatformEngineering</span><span class="pill">#DevOps</span></div>
@@ -151,8 +151,7 @@
 </article>
 <footer class="site-footer">
   <div class="container">
-    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
-    <span>Genericized patterns — not a case study of any one company.</span>
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · Allow me to help build your Enterprise AI platform</span>
   </div>
 </footer>
 <script src="../assets/js/main.js"></script>

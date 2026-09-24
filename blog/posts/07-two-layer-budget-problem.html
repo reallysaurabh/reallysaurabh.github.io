@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Two-Layer Budget Problem: Soft Allocation vs. Hard Caps — Building an Enterprise AI Platform That Scales</title>
+<title>The Two-Layer Budget Problem: Soft Allocation vs. Hard Caps - Building an Enterprise AI Platform That Scales</title>
 <meta name="description" content="Why your spend-tracking layer and your billing provider&#39;s cap are not the same system, and never should be">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%97%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,9 +55,9 @@
           <p>Somewhere in your organization right now, a team&#39;s AI budget dashboard says they have $4,000 left this month, and their actual provider account will cut them off at $500. Both numbers are &quot;correct.&quot; Neither of them knows about the other. Welcome to the two-layer budget problem.</p>
 <p>Every platform that lets multiple teams spend real money against a shared LLM provider eventually has to answer an uncomfortable question: who actually stops the spending when it needs to stop? The honest answer is that you need two separate answers, at two separate layers, and the entire discipline here is refusing to let them merge into one.</p>
 <h2 id="the-two-layers-named">The Two Layers, Named</h2>
-<p><strong>The soft layer</strong> is your platform&#39;s own bookkeeping: per-team, per-project, or per-environment allocations that you track, display, and use to make decisions like &quot;should this request be allowed&quot; or &quot;should we notify a budget owner.&quot; It&#39;s soft because it&#39;s advisory — a number your system computed and believes, not a number the money actually respects.</p>
+<p><strong>The soft layer</strong> is your platform&#39;s own bookkeeping: per-team, per-project, or per-environment allocations that you track, display, and use to make decisions like &quot;should this request be allowed&quot; or &quot;should we notify a budget owner.&quot; It&#39;s soft because it&#39;s advisory - a number your system computed and believes, not a number the money actually respects.</p>
 <p><strong>The hard layer</strong> is whatever your LLM provider (or your cloud billing account) will actually, physically enforce: a spend cap, a rate limit, a hard stop that doesn&#39;t care about your dashboards, your Slack alerts, or your feelings. It&#39;s hard because when it trips, requests fail. No appeal.</p>
-<p>The tempting shortcut is to treat these as one thing — set your soft allocation and assume it&#39;s also the enforcement mechanism, or set a hard cap and assume your dashboard will always agree with it. Both shortcuts fail in the same way: eventually, the two numbers disagree, and now you have a problem that looks like a bug but is actually a design gap.</p>
+<p>The tempting shortcut is to treat these as one thing - set your soft allocation and assume it&#39;s also the enforcement mechanism, or set a hard cap and assume your dashboard will always agree with it. Both shortcuts fail in the same way: eventually, the two numbers disagree, and now you have a problem that looks like a bug but is actually a design gap.</p>
 <figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 760 460" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -72,9 +72,9 @@
 
     <!-- Soft layer -->
     <rect x="60" y="80" width="640" height="110" rx="8" fill="#eef4ff" stroke="#3b6fd6" stroke-width="1.5"/>
-    <text x="80" y="106" font-size="13" font-weight="600" fill="#3b6fd6">SOFT LAYER — Platform Allocation Tracking</text>
+    <text x="80" y="106" font-size="13" font-weight="600" fill="#3b6fd6">SOFT LAYER - Platform Allocation Tracking</text>
     <text x="80" y="128" font-size="12" fill="#333">Per-team / per-project budgets, dashboards, alerts</text>
-    <text x="80" y="148" font-size="12" fill="#333">Fast, queryable, advisory — believes it's authoritative</text>
+    <text x="80" y="148" font-size="12" fill="#333">Fast, queryable, advisory - believes it's authoritative</text>
     <rect x="480" y="118" width="190" height="48" rx="6" fill="#ffffff" stroke="#3b6fd6"/>
     <text x="575" y="138" font-size="11" text-anchor="middle" fill="#3b6fd6" font-weight="600">Team says: "$4,000 left"</text>
     <text x="575" y="154" font-size="11" text-anchor="middle" fill="#3b6fd6">(soft-layer belief)</text>
@@ -83,7 +83,7 @@
 
     <!-- Hard layer -->
     <rect x="60" y="230" width="640" height="110" rx="8" fill="#fff3ec" stroke="#d6603b" stroke-width="1.5"/>
-    <text x="80" y="256" font-size="13" font-weight="600" fill="#d6603b">HARD LAYER — Provider Billing Enforcement</text>
+    <text x="80" y="256" font-size="13" font-weight="600" fill="#d6603b">HARD LAYER - Provider Billing Enforcement</text>
     <text x="80" y="278" font-size="12" fill="#333">Actual account-level spend cap, enforced by the provider</text>
     <text x="80" y="298" font-size="12" fill="#333">Doesn't know or care about the soft layer's bookkeeping</text>
     <rect x="480" y="268" width="190" height="48" rx="6" fill="#ffffff" stroke="#d6603b"/>
@@ -100,23 +100,23 @@
   </svg></div><figcaption>It shows a request passing through the soft allocation layer first, then the hard cap layer beneath it, and the &quot;trapped capacity&quot; state that appears when the two layers disagree about who&#39;s authoritative.</figcaption><a class="diagram-standalone-link" href="../diagrams/07-two-layer-budget.html" target="_blank" rel="noopener">Open standalone diagram ↗</a></figure>
 <h2 id="how-they-drift-apart">How They Drift Apart</h2>
 <p>Consider a scaling logistics company running an internal AI platform for forty engineering teams. The platform team builds a soft allocation system: each team gets a monthly token/dollar budget, tracked in a database, decremented as usage comes in. It&#39;s fast, it&#39;s queryable, it renders nice dashboards. Meanwhile, the actual bill is paid through a single shared provider account with its own cap, set by finance, who has never heard of the platform&#39;s internal allocation table and never will.</p>
-<p>For a while, this works, because usage is well under both ceilings. Then one team ships a feature that triples their token consumption overnight. The soft layer flags it, sends a Slack alert, maybe throttles new requests. But the soft layer&#39;s throttle only stops <em>new platform-mediated requests</em> — it does nothing about background jobs, retried batch pipelines, or anything that doesn&#39;t pass through the platform&#39;s own gate. The hard cap, meanwhile, has no idea any of this internal bookkeeping exists. It just watches total spend on the account, and when it crosses the line, it cuts everyone off — including the twenty other teams who never came close to their soft allocation.</p>
+<p>For a while, this works, because usage is well under both ceilings. Then one team ships a feature that triples their token consumption overnight. The soft layer flags it, sends a Slack alert, maybe throttles new requests. But the soft layer&#39;s throttle only stops <em>new platform-mediated requests</em> - it does nothing about background jobs, retried batch pipelines, or anything that doesn&#39;t pass through the platform&#39;s own gate. The hard cap, meanwhile, has no idea any of this internal bookkeeping exists. It just watches total spend on the account, and when it crosses the line, it cuts everyone off - including the twenty other teams who never came close to their soft allocation.</p>
 <p>This is &quot;trapped capacity&quot; in its purest form: the soft layer believes there&#39;s $4,000 of headroom, distributed fairly across teams; the hard layer has already run out. Nobody can spend the capacity the dashboard says exists, because the dashboard was never wired to anything that actually enforces spend.</p>
 <p>The inverse failure is just as common and arguably more infuriating: a hard cap set generously high (because nobody wants a false-positive outage), paired with a soft allocation system that&#39;s overly conservative and blocks legitimate requests well before the money would actually run out. Now you have real, paid-for capacity sitting unused because your own platform is more restrictive than the wallet backing it.</p>
 <h2 id="why-you-can39t-just-merge-them">Why You Can&#39;t Just Merge Them</h2>
-<p>The obvious &quot;fix&quot; — just make the soft layer <em>be</em> the hard layer, i.e., give the platform&#39;s allocation table the actual power to cut off provider access — sounds appealing until you remember that the soft layer is, definitionally, a system you built, with your bugs in it. If your allocation-tracking service has an outage, a race condition, or a bad deploy, do you want that to be the <em>only</em> thing standing between your organization and an unbounded bill? Almost certainly not. You want the provider&#39;s own billing cap as a backstop that works even when your platform is on fire. That&#39;s the entire point of having two layers: the soft layer optimizes for good UX and fair distribution; the hard layer exists purely as a circuit breaker that doesn&#39;t trust your code.</p>
-<p>The mental model that&#39;s worked for us isn&#39;t &quot;which layer is correct&quot; — it&#39;s &quot;which layer is responsible for which failure mode.&quot; The soft layer&#39;s job is to make spending <em>legible and fair</em> before anything goes wrong. The hard layer&#39;s job is to make sure that when everything else goes wrong, the bill still has a ceiling. We won&#39;t pretend this is the only valid split — some teams we&#39;ve talked to fold the hard cap into the platform entirely and accept the risk, and for a smaller org that might genuinely be the more pragmatic trade-off.</p>
+<p>The obvious &quot;fix&quot; - just make the soft layer <em>be</em> the hard layer, i.e., give the platform&#39;s allocation table the actual power to cut off provider access - sounds appealing until you remember that the soft layer is, definitionally, a system you built, with your bugs in it. If your allocation-tracking service has an outage, a race condition, or a bad deploy, do you want that to be the <em>only</em> thing standing between your organization and an unbounded bill? Almost certainly not. You want the provider&#39;s own billing cap as a backstop that works even when your platform is on fire. That&#39;s the entire point of having two layers: the soft layer optimizes for good UX and fair distribution; the hard layer exists purely as a circuit breaker that doesn&#39;t trust your code.</p>
+<p>The mental model that&#39;s worked for us isn&#39;t &quot;which layer is correct&quot; - it&#39;s &quot;which layer is responsible for which failure mode.&quot; The soft layer&#39;s job is to make spending <em>legible and fair</em> before anything goes wrong. The hard layer&#39;s job is to make sure that when everything else goes wrong, the bill still has a ceiling. We won&#39;t pretend this is the only valid split - some teams we&#39;ve talked to fold the hard cap into the platform entirely and accept the risk, and for a smaller org that might genuinely be the more pragmatic trade-off.</p>
 <h2 id="what39s-worked-for-us-so-far">What&#39;s Worked for Us So Far</h2>
-<p>Treat the two layers as intentionally loosely coupled, with each one&#39;s ceiling set with headroom for the other&#39;s error margin. This is the version we&#39;ve landed on after a couple of false starts — concretely:</p>
+<p>Treat the two layers as intentionally loosely coupled, with each one&#39;s ceiling set with headroom for the other&#39;s error margin. This is the version we&#39;ve landed on after a couple of false starts - concretely:</p>
 <ul>
-<li>The hard cap should sit comfortably above the <em>sum</em> of soft allocations, with a buffer for burst usage that the soft layer hasn&#39;t caught up to yet — not equal to it.</li>
+<li>The hard cap should sit comfortably above the <em>sum</em> of soft allocations, with a buffer for burst usage that the soft layer hasn&#39;t caught up to yet - not equal to it.</li>
 <li>The soft layer should degrade gracefully and loudly when it can&#39;t confirm its own state (don&#39;t fail open silently; alert and slow down).</li>
-<li>Someone — a real owner, not a shared inbox — needs to reconcile the two on a schedule, because they <em>will</em> drift as usage patterns and provider pricing change.</li>
+<li>Someone - a real owner, not a shared inbox - needs to reconcile the two on a schedule, because they <em>will</em> drift as usage patterns and provider pricing change.</li>
 <li>Never let a single team&#39;s soft-layer failure become a hard-layer incident for everyone else. If one team can trigger the account-wide cap, your soft layer isn&#39;t actually doing its job of containment.</li>
 </ul>
 <h2 id="pitfalls">Pitfalls</h2>
 <p>The most common mistake isn&#39;t technical, it&#39;s organizational: the soft layer is usually owned by the platform team, and the hard layer is usually owned by finance or a cloud/procurement team who set it once and forgot about it. If those two groups aren&#39;t talking, the two layers will silently diverge until an outage forces the conversation. Put a recurring reconciliation review on the calendar before you need one.</p>
-<p>The second most common mistake is building elaborate self-service budgeting UX on the soft layer and then routing every exception — every &quot;I need more budget&quot; request — through email. That one&#39;s exactly the failure mode we&#39;ll dig into next: <strong>Self-Service Limits Need an Audit Trail, Not an Email Thread.</strong></p>
+<p>The second most common mistake is building elaborate self-service budgeting UX on the soft layer and then routing every exception - every &quot;I need more budget&quot; request - through email. That one&#39;s exactly the failure mode we&#39;ll dig into next: <strong>Self-Service Limits Need an Audit Trail, Not an Email Thread.</strong></p>
 <p>Where we&#39;re genuinely still not sure: how much buffer to build into the hard cap above the sum of soft allocations. We&#39;ve picked a number that feels safe, but it&#39;s a guess dressed up as a policy, and if you&#39;ve found a more principled way to size that buffer, we&#39;d like to hear it.</p>
 <p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #FinOps #CostManagement #CloudCosts #LLMOps</p>
 
@@ -142,8 +142,7 @@
 </article>
 <footer class="site-footer">
   <div class="container">
-    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · self-hosted diagrams · no tracking</span>
-    <span>Genericized patterns — not a case study of any one company.</span>
+    <span>By <a href="https://reallysaurabh.github.io/">Saurabh Gupta</a> · 21 posts · Allow me to help build your Enterprise AI platform</span>
   </div>
 </footer>
 <script src="../assets/js/main.js"></script>
