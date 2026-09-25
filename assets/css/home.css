@@ -172,6 +172,14 @@ html { scroll-behavior: smooth; }
   margin: 0;
   color: var(--color-text-muted);
 }
+.scholar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.scholar-link svg { flex-shrink: 0; }
 
 /* ============================================================
    Experience timeline
@@ -486,71 +494,16 @@ html { scroll-behavior: smooth; }
    Life events
    ============================================================ */
 .life-list {
-  list-style: none;
+  list-style: disc;
   margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--color-border);
-}
-.life-year {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 20px;
-  padding: 22px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-.life-year > h3 {
-  font-family: var(--font-serif);
-  font-size: 1.6rem;
-  font-weight: 600;
-  line-height: 1.1;
-  margin: 0;
-  color: var(--color-text-faint);
-}
-.life-year > ol {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-.life-event {
-  --life-hue: var(--part-0);
-  position: relative;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid hsl(var(--life-hue));
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
-  box-shadow: var(--shadow-sm);
-}
-.life-research  { --life-hue: var(--part-1); }
-.life-education { --life-hue: var(--part-2); }
-.life-writing   { --life-hue: var(--part-3); }
-.life-open      { --life-hue: var(--part-4); }
-.life-personal  { --life-hue: var(--part-5); }
-.life-kind {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: hsl(var(--life-hue));
-  margin-bottom: 4px;
-}
-.life-event h4 {
-  font-family: var(--font-serif);
-  font-size: 1.08rem;
-  font-weight: 600;
-  line-height: 1.3;
-  margin: 0 0 4px;
-}
-.life-event p {
-  margin: 0;
+  padding-left: 1.25rem;
   font-size: 0.92rem;
+  line-height: 1.6;
   color: var(--color-text-muted);
 }
-@media (max-width: 760px) {
-  .life-year { grid-template-columns: 1fr; gap: 12px; }
-  .life-year > ol { grid-template-columns: 1fr; }
+.life-list > li + li {
+  margin-top: 8px;
+}
+.life-list strong {
+  color: var(--color-text);
 }
