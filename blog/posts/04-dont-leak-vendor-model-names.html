@@ -119,13 +119,11 @@
 <li><strong>Vendor deprecations become a registry update, not an incident.</strong> You repoint one row; consumers keep calling the same identifier they always have.</li>
 <li><strong>Your API surface actually belongs to you.</strong> You can document, version, and evolve a resource ID on your own terms. You can&#39;t do any of that for a string someone else&#39;s product team owns.</li>
 </ul>
-<h2 id="the-one-place-we39ve-gone-back-and-forth">The one place we&#39;ve gone back and forth</h2>
-<p>Where we&#39;re genuinely less certain: how much of the vendor&#39;s own versioning semantics to surface <em>through</em> your resource ID versus hide entirely. Fully hiding it is the purest version of the pattern, but it means a consumer can&#39;t tell &quot;am I on the newest capable model&quot; without asking your registry a separate question. We&#39;ve landed on exposing a coarse version marker on our own resource ID (a <code>v1</code>, <code>v2</code> on <em>our</em> identifier, bumped when we choose to, not when the vendor does) rather than the vendor&#39;s raw version string - but we wouldn&#39;t call this settled, and if you&#39;ve found a cleaner way to give consumers visibility without recoupling them to the vendor&#39;s naming, that&#39;s a trade-off worth comparing notes on.</p>
+<h2 id="the-one-place-we39ve-gone-back-and-forth">The one place I&#39;ve gone back and forth</h2>
+<p>Where I&#39;am genuinely less certain: how much of the vendor&#39;s own versioning semantics to surface <em>through</em> your resource ID versus hide entirely. Fully hiding it is the purest version of the pattern, but it means a consumer can&#39;t tell &quot;am I on the newest capable model&quot; without asking your registry a separate question. I&#39;ve landed on exposing a coarse version marker on my own resource ID (a <code>v1</code>, <code>v2</code> on <em>our</em> identifier, bumped when we choose to, not when the vendor does) rather than the vendor&#39;s raw version string - but I wouldn&#39;t call this settled, and if you&#39;ve found a cleaner way to give consumers visibility without recoupling them to the vendor&#39;s naming, that&#39;s a trade-off worth comparing notes on.</p>
 <p>This is a small pattern with an outsized payoff, and it&#39;s one of the cheapest things to get right early - which is exactly why <a href="21-capstone-what-wed-do-differently.html">the capstone</a> later in this series flags it as a &quot;do this on day one&quot; item.</p>
-<p>Next: <a href="05-multi-cloud-iac-foundation-vs-per-resource.html">post 5</a>, on a related decoupling problem one layer down - separating the infrastructure that&#39;s shared and long-lived from the infrastructure that&#39;s provisioned and torn down per resource.</p>
-<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIPlatform #APIDesign #SoftwareArchitecture #PlatformEngineering #MLOps #MultiCloud #TechDebt #AIInfrastructure</p>
 
-          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIPlatform</span><span class="pill">#APIDesign</span><span class="pill">#SoftwareArchitecture</span><span class="pill">#PlatformEngineering</span><span class="pill">#MLOps</span><span class="pill">#MultiCloud</span></div>
+          <div class="post-tags"><span class="pill">Enterprise AI</span><span class="pill">AI Platform</span><span class="pill">API Design</span><span class="pill">Software Architecture</span><span class="pill">Platform Engineering</span><span class="pill">MLOps</span><span class="pill">Multi Cloud</span></div>
         </div>
         <div class="post-pager">
     <a class="pager-link prev" href="03-environments-not-just-endpoints.html"><span class="pager-direction">← Previous</span><span class="pager-title">Why Your AI Platform Needs Environments, Not Just Endpoints</span></a>
@@ -138,7 +136,7 @@
       <li><a href="#the-coupling-trap">The coupling trap</a></li>
       <li><a href="#a-small-hypothetical-example">A small, hypothetical example</a></li>
       <li><a href="#what-this-buys-you-concretely">What this buys you, concretely</a></li>
-      <li><a href="#the-one-place-we39ve-gone-back-and-forth">The one place we&amp;#39;ve gone back and forth</a></li>
+      <li><a href="#the-one-place-we39ve-gone-back-and-forth">The one place I've gone back and forth</a></li>
     </ol>
   </aside>
     </div>
