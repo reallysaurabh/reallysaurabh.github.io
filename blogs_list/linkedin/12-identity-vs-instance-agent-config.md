@@ -38,7 +38,7 @@ Once you draw this line, a redeploy stops being an identity crisis. You tear dow
 
 ## A Small, Concrete Example
 
-Picture a 200-engineer logistics company running an internal agent that reconciles shipment exceptions against a claims system. It's been running for four months, has an accrued set of read/write grants to three internal systems, and — because someone finally listened to post 15 in this series — a durable memory store of past exception patterns it's learned to recognize.
+Picture a 200-engineer  company running an internal agent that reconciles shipment exceptions against a claims system. It's been running for four months, has an accrued set of read/write grants to three internal systems, and — because someone finally listened to post 15 in this series — a durable memory store of past exception patterns it's learned to recognize.
 
 Now the team wants to bump it to a newer model version. If identity and instance are one resource, this "routine model bump" requires re-provisioning every downstream grant, reconnecting the memory store, and hoping the audit system's foreign keys don't mind that the agent effectively just died and was reborn. If they're split, the team deploys a new instance against the existing identity, the grants and memory were never touched, and the "big scary model upgrade" is, from every other system's point of view, a non-event.
 

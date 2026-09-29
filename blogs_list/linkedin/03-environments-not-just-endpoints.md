@@ -13,7 +13,7 @@ Traditional software engineering settled the dev/staging/production question dec
 
 ## What breaks without real environments
 
-Picture a scaling logistics company running an internal AI platform. One team wants to try out a newly released model for a customer-support agent — genuinely reasonable, everyone wants to try the new thing. They register it. It's now sitting in the same model registry as every production model, addressable by every service that knows how to ask the registry for a model by name.
+Picture a scaling  company running an internal AI platform. One team wants to try out a newly released model for a customer-support agent — genuinely reasonable, everyone wants to try the new thing. They register it. It's now sitting in the same model registry as every production model, addressable by every service that knows how to ask the registry for a model by name.
 
 A week later, someone building a completely unrelated production feature queries "what models are available" and gets the experimental one back in the list, because nothing distinguished it. Or worse: the experimental registration shares a name or a routing rule with something already serving production traffic, and now an in-progress experiment is quietly eating into a live customer path. Nobody did anything wrong, exactly. There just wasn't a wall where a wall needed to be.
 
@@ -25,7 +25,7 @@ We ended up with a fairly conventional shape — dev, staging, and production �
 
 *Diagram: open `diagrams/03-environment-topology.html` in a browser.* It shows the three environments, per-environment model registrations sitting inside each one rather than shared globally, and the promotion path connecting them — plus a callout on the one governance rule we found we actually needed to enforce, not just suggest.
 
-**Model registrations are per-environment, not global.** A model registered in dev is invisible to staging and production. It has to be explicitly, deliberately registered again in the next environment up — which sounds like friction, and is, on purpose. The alternative — one global registry with an environment tag on each entry — sounds more elegant right up until someone forgets to check the tag, or a query forgets to filter on it, and now you're back to the logistics-company scenario above.
+**Model registrations are per-environment, not global.** A model registered in dev is invisible to staging and production. It has to be explicitly, deliberately registered again in the next environment up — which sounds like friction, and is, on purpose. The alternative — one global registry with an environment tag on each entry — sounds more elegant right up until someone forgets to check the tag, or a query forgets to filter on it, and now you're back to the -company scenario above.
 
 **Promotion is a deliberate action, not automatic.** Nothing in staging silently becomes production just because it's been sitting there quietly and nobody complained. Someone — or some pipeline, with someone's sign-off baked in — has to say "yes, promote this."
 

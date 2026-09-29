@@ -23,7 +23,7 @@ The tempting shortcut is to treat these as one thing — set your soft allocatio
 
 ## How They Drift Apart
 
-Consider a scaling logistics company running an internal AI platform for forty engineering teams. The platform team builds a soft allocation system: each team gets a monthly token/dollar budget, tracked in a database, decremented as usage comes in. It's fast, it's queryable, it renders nice dashboards. Meanwhile, the actual bill is paid through a single shared provider account with its own cap, set by finance, who has never heard of the platform's internal allocation table and never will.
+Consider a scaling  company running an internal AI platform for forty engineering teams. The platform team builds a soft allocation system: each team gets a monthly token/dollar budget, tracked in a database, decremented as usage comes in. It's fast, it's queryable, it renders nice dashboards. Meanwhile, the actual bill is paid through a single shared provider account with its own cap, set by finance, who has never heard of the platform's internal allocation table and never will.
 
 For a while, this works, because usage is well under both ceilings. Then one team ships a feature that triples their token consumption overnight. The soft layer flags it, sends a Slack alert, maybe throttles new requests. But the soft layer's throttle only stops *new platform-mediated requests* — it does nothing about background jobs, retried batch pipelines, or anything that doesn't pass through the platform's own gate. The hard cap, meanwhile, has no idea any of this internal bookkeeping exists. It just watches total spend on the account, and when it crosses the line, it cuts everyone off — including the twenty other teams who never came close to their soft allocation.
 

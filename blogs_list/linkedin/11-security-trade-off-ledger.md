@@ -37,7 +37,7 @@ We'll admit a limitation we haven't fully solved: keeping the ledger current req
 
 ## A Small Worked Example
 
-A scaling logistics company's security team, doing a routine review, found a Vault-adjacent integration where JWT-based authentication had never actually been exercised outside of production, because the local development setup for Vault didn't support the auth method being used in prod. Nobody had lied about this — it just wasn't written down anywhere a reviewer would naturally look. Once it went into the ledger, with a note that the JWT auth path needed a dedicated integration test against a real instance rather than local dev, the gap stopped being an invisible assumption and became a tracked, owned item with a plan attached. That's really the whole value proposition: not eliminating the risk, just making sure it can't quietly disappear from view.
+A scaling  company's security team, doing a routine review, found a Vault-adjacent integration where JWT-based authentication had never actually been exercised outside of production, because the local development setup for Vault didn't support the auth method being used in prod. Nobody had lied about this — it just wasn't written down anywhere a reviewer would naturally look. Once it went into the ledger, with a note that the JWT auth path needed a dedicated integration test against a real instance rather than local dev, the gap stopped being an invisible assumption and became a tracked, owned item with a plan attached. That's really the whole value proposition: not eliminating the risk, just making sure it can't quietly disappear from view.
 
 ## Pitfalls
 

@@ -19,7 +19,7 @@ The trouble starts when a platform's tooling doesn't clearly separate these two,
 
 ## What it looks like when this goes wrong
 
-Here's a version of the scenario that's easy to imagine happening to a scaling logistics company running AI infrastructure across two cloud regions: a per-resource deprovisioning routine is written to "clean up everything associated with this resource," and — because the resource's provisioning template happened to also touch a piece of shared networking config, maybe just to attach it — the cleanup routine tears that shared piece down too, on the theory that if it created it, it can also delete it.
+Here's a version of the scenario that's easy to imagine happening to a scaling  company running AI infrastructure across two cloud regions: a per-resource deprovisioning routine is written to "clean up everything associated with this resource," and — because the resource's provisioning template happened to also touch a piece of shared networking config, maybe just to attach it — the cleanup routine tears that shared piece down too, on the theory that if it created it, it can also delete it.
 
 Except it didn't create it. It reused something that was already there, that a dozen other resources also depend on. The deprovisioning succeeds without complaint, exactly as designed, and a few minutes later some completely unrelated team's traffic starts failing in a way nobody would think to connect to "someone deleted an AI agent that had nothing to do with them."
 

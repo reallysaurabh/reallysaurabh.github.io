@@ -56,7 +56,7 @@
 <h2 id="the-problem-one-repo-several-things-that-ship-independently">The problem: one repo, several things that ship independently</h2>
 <p>A platform like the one we&#39;ve been describing across this series rarely ships as a single binary. There&#39;s a CLI developers install locally. There&#39;s a control plane that gets deployed to a cluster. There&#39;s often a proxy or gateway component sitting in the request path. These live in the same monorepo - sensible, since they share types, share tooling, share a review process - but they absolutely do not ship on the same schedule. A CLI fix shouldn&#39;t force a control-plane redeploy. A control-plane hotfix shouldn&#39;t force everyone to reinstall the CLI.</p>
 <p>Plain semantic versioning (<code>v2.3.1</code>) works beautifully when there&#39;s one thing to version. The moment there are three independently-releasable components sharing a repo, a bare <code>v2.3.1</code> tag becomes a question instead of an answer: version 2.3.1 of <em>what</em>, exactly?</p>
-<h2 id="what-we-landed-on-prefix-the-component-into-the-tag">What we landed on: prefix the component into the tag</h2>
+<h2 id="what-we-landed-on-prefix-the-component-into-the-tag">Prefix the component into the tag</h2>
 <p>The fix we&#39;ve used is boring in the best way - prefix the semver tag with the component name: <code>cli-v2.3.0</code>, <code>controlplane-v1.14.2</code>, <code>proxy-v0.9.4</code>. Each component gets its own independent version lineage, bumped only when <em>that</em> component changes, tagged and released through its own pipeline trigger.</p>
 <figure class="diagram-frame"><div class="diagram-media"><svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -144,7 +144,7 @@
     <p class="toc-label">On this page</p>
     <ol>
       <li><a href="#the-problem-one-repo-several-things-that-ship-independently">The problem: one repo, several things that ship independently</a></li>
-      <li><a href="#what-we-landed-on-prefix-the-component-into-the-tag">What we landed on: prefix the component into the tag</a></li>
+      <li><a href="#what-we-landed-on-prefix-the-component-into-the-tag">Prefix the component into the tag</a></li>
       <li><a href="#the-other-half-making-developer-builds-unmistakably-not-production">The other half: making developer builds unmistakably not-production</a></li>
       <li><a href="#a-small-hypothetical-example">A small, hypothetical example</a></li>
       <li><a href="#pitfalls">Pitfalls</a></li>
