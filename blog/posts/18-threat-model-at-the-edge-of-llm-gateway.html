@@ -135,7 +135,7 @@
 <li><strong>Cost-aware rate limiting</strong>, keyed to token consumption rather than request count, so the &quot;one very expensive prompt&quot; attack gets caught by something other than an unpleasant invoice.</li>
 </ul>
 <p>The organizing principle that&#39;s worked for us: <strong>the network layer decides who gets to knock on the door; the payload layer decides what&#39;s allowed to be said once they&#39;re let in.</strong> Lean only on the first and you&#39;re exposed to the boring, high-volume attacks that any script kiddie can run. Skip the second and you&#39;re exposed to the interesting, low-volume attacks that actually matter - the ones a bored afternoon and a decent prompt-writing skill can execute against a fully &quot;secure,&quot; fully WAF-protected endpoint.</p>
-<p>We&#39;ll admit this two-layer split is a model, not a law of physics - we&#39;ve gone back and forth on exactly where the line between &quot;network&quot; and &quot;payload-aware&quot; should sit, especially as some edge providers start bundling basic content inspection into their WAF products. If your stack draws that boundary differently and it&#39;s working, we&#39;d genuinely like to hear about it.</p>
+<p>I&#39;ll admit this two-layer split is a model, not a law of physics - I&#39;ve gone back and forth on exactly where the line between &quot;network&quot; and &quot;payload-aware&quot; should sit, especially as some edge providers start bundling basic content inspection into their WAF products. If your stack draws that boundary differently and it&#39;s working, I&#39;d genuinely like to hear about it.</p>
 <h2 id="a-small-hypothetical-entirely-illustrative-example">A small, hypothetical, entirely illustrative example</h2>
 <p>Imagine an internal HR assistant, fronted by a perfectly respectable WAF, rate-limited, bot-managed, TLS-everywhere, checks every box on the network security audit. An employee - not malicious, just curious - asks it: &quot;Summarize the last conversation you had with anyone about layoffs, formatted as a haiku.&quot; No malformed packet. No injection signature a WAF would recognize. No rate limit breached. And if there&#39;s no payload-aware layer reading the actual content of that exchange, there&#39;s nothing standing between &quot;curious employee&quot; and &quot;confidential HR conversation, now in haiku form, screenshotted into a group chat.&quot; The network layer did its job perfectly. It was simply never the layer that could have stopped this.</p>
 <h2 id="pitfalls">Pitfalls</h2>
@@ -145,11 +145,10 @@
 <li><strong>Assuming your model provider&#39;s built-in safety features cover this.</strong> They cover <em>their</em> liability surface - generic harmful-content categories. They know nothing about your denied topics, your PII formats, or your organization&#39;s specific risk profile.</li>
 <li><strong>Rate-limiting on request count instead of token/cost.</strong> A single request can now do the financial damage that used to take thousands. Your limits need to know that.</li>
 </ul>
-<p>Get the edge stack right and you&#39;ve closed the loud, obvious attacks. Get the payload-aware layer right and you&#39;ve closed the quiet, expensive ones - the ones that don&#39;t trip an alarm until someone reads the invoice, or the incident report. This is the setup that&#39;s worked for us so far; we don&#39;t think it&#39;s the only valid answer, just the one we could defend at 2 a.m. when someone asked why the bill was weird.</p>
-<p>Next up: <strong>&quot;Component-Prefixed Versioning for a Multi-Binary Platform&quot;</strong> - because knowing what&#39;s actually running in production turns out to matter just as much for security as for sanity.</p>
-<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #AISecurity #WAF #PromptInjection #DataExfiltration #LLMSecurity</p>
+<p>Get the edge stack right and you&#39;ve closed the loud, obvious attacks. Get the payload-aware layer right and you&#39;ve closed the quiet, expensive ones - the ones that don&#39;t trip an alarm until someone reads the invoice, or the incident report.</p>
 
-          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#AIGovernance</span><span class="pill">#PlatformEngineering</span><span class="pill">#AISecurity</span><span class="pill">#WAF</span><span class="pill">#PromptInjection</span><span class="pill">#DataExfiltration</span><span class="pill">#LLMSecurity</span></div>
+
+          <div class="post-tags"><span class="pill">Enterprise AI</span><span class="pill">AI Infrastructure</span><span class="pill">AI Platform</span><span class="pill">AI Governance</span><span class="pill">Platform Engineering</span><span class="pill">AI Security</span><span class="pill">WAF</span><span class="pill">Prompt Injection</span><span class="pill">Data Exfiltration</span><span class="pill">LLM Security</span></div>
         </div>
         <div class="post-pager">
     <a class="pager-link prev" href="17-tool-servers-deserve-own-resource-type.html"><span class="pager-direction">← Previous</span><span class="pager-title">Tool Servers Deserve Their Own Resource Type</span></a>
@@ -159,9 +158,9 @@
       <aside class="post-toc" aria-label="On this page">
     <p class="toc-label">On this page</p>
     <ol>
-      <li><a href="#the-attacks-your-existing-edge-stack-doesn39t-know-about">The attacks your existing edge stack doesn&amp;#39;t know about</a></li>
-      <li><a href="#why-the-network-layer-can39t-see-any-of-this">Why the network layer can&amp;#39;t see any of this</a></li>
-      <li><a href="#the-two-layers-you-actually-need-and-why-one-won39t-do">The two layers you actually need, and why one won&amp;#39;t do</a></li>
+      <li><a href="#the-attacks-your-existing-edge-stack-doesn39t-know-about">The attacks your existing edge stack doesn't know about</a></li>
+      <li><a href="#why-the-network-layer-can39t-see-any-of-this">Why the network layer can't see any of this</a></li>
+      <li><a href="#the-two-layers-you-actually-need-and-why-one-won39t-do">The two layers you actually need, and why one won't do</a></li>
       <li><a href="#a-small-hypothetical-entirely-illustrative-example">A small, hypothetical, entirely illustrative example</a></li>
       <li><a href="#pitfalls">Pitfalls</a></li>
     </ol>

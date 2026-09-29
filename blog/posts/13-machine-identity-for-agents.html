@@ -99,16 +99,14 @@
 <h2 id="a-small-concrete-example">A Small, Concrete Example</h2>
 <p>Imagine a mid-sized retailer running an overnight agent that reconciles inventory discrepancies across regional warehouses. It runs unattended, starting around 1am when transaction volume is lowest. If its credential is a static key embedded in a config map, that key is now the single most attractive target in the whole pipeline - valid indefinitely, used by something nobody&#39;s actively supervising, running at exactly the hour when anomalous activity is least likely to be noticed by anyone.</p>
 <p>Swap that for a federated identity with automatic make-before-break rotation, and the attractive target disappears. There&#39;s no key to steal, because there was never a key - just a chain of trust that traces back to infrastructure the security team already monitors, refreshed on a schedule the agent never even has to know about.</p>
-<h2 id="where-we-went-back-and-forth">Where We Went Back and Forth</h2>
-<p>We debated the fallback question longer than we expected to. There&#39;s a real argument for a degraded-but-working mode when the federated path is unavailable - availability matters too, and &quot;fail the task&quot; has its own cost if it happens often. We ultimately chose to fail closed rather than fall back to a static key, but we&#39;re not fully certain that&#39;s right for every workload, especially latency-sensitive ones where a failed task is expensive to retry. If you&#39;ve built a fallback path you trust, we&#39;d like to hear how you scoped it so it doesn&#39;t become the de facto credential.</p>
 <h2 id="a-few-things-worth-watching-for">A Few Things Worth Watching For</h2>
-<p>We&#39;d steer away from leaving a static key as a literal fallback for the federated path - in our experience it tends to become the path of least resistance rather than a rare safety net, which quietly reintroduces the exact risk profile you were trying to eliminate.</p>
-<p>Scoping the federated credential broadly &quot;to be safe&quot; is another one we&#39;d caution against - the whole benefit of short-lived, federated credentials is that a leak is self-limiting, and broad scope trades that away for configuration convenience.</p>
+<p>I&#39;d steer away from leaving a static key as a literal fallback for the federated path - in my experience it tends to become the path of least resistance rather than a rare safety net, which quietly reintroduces the exact risk profile you were trying to eliminate.</p>
+<p>Scoping the federated credential broadly &quot;to be safe&quot; is another one I&#39;d caution against - the whole benefit of short-lived, federated credentials is that a leak is self-limiting, and broad scope trades that away for configuration convenience.</p>
 <p>And it&#39;s worth double-checking that rotation is actually make-before-break rather than assumed to be, just because the cloud provider issues short-lived credentials. The provider issuing short-lived credentials doesn&#39;t automatically give you that overlap window - that&#39;s an integration decision your platform has to make deliberately, in how and when it requests a refreshed credential relative to expiry.</p>
-<p>Getting an agent&#39;s own identity right helped us a lot, but it wasn&#39;t sufficient on its own - an agent also needs to act <em>as the user who asked it to do something</em>, not just as itself. That&#39;s the next post&#39;s whole argument, and it&#39;s one we&#39;re still refining too.</p>
-<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #ZeroTrust #WorkloadIdentity #IAM #CloudSecurity</p>
+<p>Getting an agent&#39;s own identity right helped me a lot, but it wasn&#39;t sufficient on its own - an agent also needs to act <em>as the user who asked it to do something</em>, not just as itself. That&#39;s the next post&#39;s whole argument, and it&#39;s one I&#39;m still refining too.</p>
 
-          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#AIGovernance</span><span class="pill">#PlatformEngineering</span><span class="pill">#ZeroTrust</span><span class="pill">#WorkloadIdentity</span><span class="pill">#IAM</span><span class="pill">#CloudSecurity</span></div>
+
+          <div class="post-tags"><span class="pill">Enterprise AI</span><span class="pill">AI Infrastructure</span><span class="pill">AI Platform</span><span class="pill">AI Governance</span><span class="pill">Platform Engineering</span><span class="pill">Zero Trust</span><span class="pill">Workload Identity</span><span class="pill">IAM</span><span class="pill">Cloud Security</span></div>
         </div>
         <div class="post-pager">
     <a class="pager-link prev" href="12-identity-vs-instance-agent-config.html"><span class="pager-direction">← Previous</span><span class="pager-title">Identity vs. Instance: Why Your Agent&#39;s Config Shouldn&#39;t Live Inside Its Deployment</span></a>
@@ -122,7 +120,6 @@
       <li><a href="#federation-not-secrets">Federation, Not Secrets</a></li>
       <li><a href="#rotation-without-a-window">Rotation Without a Window</a></li>
       <li><a href="#a-small-concrete-example">A Small, Concrete Example</a></li>
-      <li><a href="#where-we-went-back-and-forth">Where We Went Back and Forth</a></li>
       <li><a href="#a-few-things-worth-watching-for">A Few Things Worth Watching For</a></li>
     </ol>
   </aside>

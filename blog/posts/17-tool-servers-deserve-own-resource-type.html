@@ -123,16 +123,15 @@
 <h2 id="a-small-concrete-example">A Small, Concrete Example</h2>
 <p>Consider a platform team at a mid-sized insurer that built an agent to look up policy details from an internal system, purely to support one claims-processing agent. It worked well enough that three other teams started calling it too - a fraud-detection agent, a customer-service agent, a renewals agent. Nobody made a decision to turn it into shared infrastructure; it just happened, one dependency at a time.</p>
 <p>Then the original team wants to redeploy it with a new set of permissions scoped to <em>their</em> use case - a perfectly reasonable thing to do to &quot;their agent.&quot; Three other teams&#39; agents break, because nobody had a way to see, before making that change, that this &quot;agent&quot; was actually load-bearing for a quarter of the platform&#39;s active workflows. Modeled as a tool server from the start, that dependency would have been visible in the resource graph the moment the second team started calling it - not discovered retroactively via an incident channel.</p>
-<h2 id="where-we39re-not-fully-decided">Where We&#39;re Not Fully Decided</h2>
-<p>The genuinely hard part, for us, is deciding <em>when</em> a tool crosses the line from &quot;single-consumer, fine as-is&quot; to &quot;shared infrastructure, promote it.&quot; We don&#39;t have a clean threshold - we&#39;ve used &quot;a second team started depending on it&quot; as a rough trigger, but that&#39;s reactive by nature, and reactive is exactly what let the insurer scenario happen in the first place. If anyone has a good leading indicator for &quot;this is about to become shared infrastructure&quot; rather than a trailing one, we&#39;d love to steal it.</p>
-<h2 id="a-few-things-we39d-watch-for">A Few Things We&#39;d Watch For</h2>
-<p>We&#39;d be wary of over-correcting into ceremony for genuinely small, single-consumer tools - not every function an agent exposes needs the full weight of a shared-infrastructure resource type, and forcing consistency for its own sake adds process without adding much safety.</p>
-<p>We&#39;d also want to make sure a tool server&#39;s permission model doesn&#39;t quietly become a rubber stamp. &quot;Any agent can call any tool&quot; undercuts the reason for separating the resource type in the first place - the point was to make caller-scoped permissions expressible, so it&#39;s worth actually expressing them.</p>
-<p>And having the right resource type doesn&#39;t automatically buy dependency visibility - the platform still needs to record and surface &quot;which agents call this tool server,&quot; or the insurer scenario above can repeat itself even with otherwise clean modeling.</p>
-<p>That&#39;s roughly how we ended up thinking about agent runtime architecture - identity, machine credentials, on-behalf-of access, memory, runtime config, and now tool servers, each earning its own resource rather than being crammed into whatever shape shipped fastest. None of it felt obvious in advance, and we&#39;re still adjusting pieces of it. Part 4 turns from <em>how agents are built</em> to <em>how the platform stays safe and legible while running them</em> - starting with the threat model at the edge of an LLM gateway. If your platform drew any of these lines differently, we&#39;d genuinely like to hear about it.</p>
-<p><strong>Suggested hashtags:</strong> #EnterpriseAI #AIInfrastructure #AIPlatform #AIGovernance #PlatformEngineering #MCP #AIAgents #APIDesign</p>
 
-          <div class="post-tags"><span class="pill">#EnterpriseAI</span><span class="pill">#AIInfrastructure</span><span class="pill">#AIPlatform</span><span class="pill">#AIGovernance</span><span class="pill">#PlatformEngineering</span><span class="pill">#MCP</span><span class="pill">#AIAgents</span><span class="pill">#APIDesign</span></div>
+<h2 id="a-few-things-we39d-watch-for">A Few Things I&#39;d Watch For</h2>
+<p>I&#39;d be wary of over-correcting into ceremony for genuinely small, single-consumer tools - not every function an agent exposes needs the full weight of a shared-infrastructure resource type, and forcing consistency for its own sake adds process without adding much safety.</p>
+<p>I&#39;d also want to make sure a tool server&#39;s permission model doesn&#39;t quietly become a rubber stamp. &quot;Any agent can call any tool&quot; undercuts the reason for separating the resource type in the first place - the point was to make caller-scoped permissions expressible, so it&#39;s worth actually expressing them.</p>
+<p>And having the right resource type doesn&#39;t automatically buy dependency visibility - the platform still needs to record and surface &quot;which agents call this tool server,&quot; or the insurer scenario above can repeat itself even with otherwise clean modeling.</p>
+<p>That&#39;s roughly how we ended up thinking about agent runtime architecture - identity, machine credentials, on-behalf-of access, memory, runtime config, and now tool servers, each earning its own resource rather than being crammed into whatever shape shipped fastest. Part 4 turns from <em>how agents are built</em> to <em>how the platform stays safe and legible while running them</em> - starting with the threat model at the edge of an LLM gateway. If your platform drew any of these lines differently, I&#39;d genuinely like to hear about it.</p>
+
+
+          <div class="post-tags"><span class="pill">Enterprise AI</span><span class="pill">AI Infrastructure</span><span class="pill">AI Platform</span><span class="pill">AI Governance</span><span class="pill">Platform Engineering</span><span class="pill">MCP</span><span class="pill">AI Agents</span><span class="pill">API Design</span></div>
         </div>
         <div class="post-pager">
     <a class="pager-link prev" href="16-config-without-redeploy.html"><span class="pager-direction">← Previous</span><span class="pager-title">Config That Changes Without a Redeploy: Env Vars and Protocol as Runtime Concerns</span></a>
@@ -145,7 +144,6 @@
       <li><a href="#how-the-tangle-happens">How the Tangle Happens</a></li>
       <li><a href="#give-it-its-own-resource-type">Give It Its Own Resource Type</a></li>
       <li><a href="#a-small-concrete-example">A Small, Concrete Example</a></li>
-      <li><a href="#where-we39re-not-fully-decided">Where We&amp;#39;re Not Fully Decided</a></li>
       <li><a href="#a-few-things-we39d-watch-for">A Few Things We&amp;#39;d Watch For</a></li>
     </ol>
   </aside>
